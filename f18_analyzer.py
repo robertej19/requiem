@@ -35,6 +35,15 @@ mp = 0.938 #Mass proton
 prefix = alpha/(8*np.pi)
 E = 10.6
 
+df = pd.read_pickle("f18_in_rec.pkl")
+print(df.head())
+print(df.shape)
+
+for item in df.columns:
+    print(item)
+
+sys.exit()
+
 #raw_f2018_in_data_epgg_no_cuts_no_corrections.pkl
 #raw_f2018_in_data_epgg_no_cuts_with_corrections.pkl
 df_epgg = pd.read_pickle("raw_f2018_in_data_epgg_no_cuts_no_corrections.pkl")

@@ -427,4 +427,6 @@ if __name__ == "__main__":
     converter = root2pickle(args.fname, entry_start = args.entry_start, entry_stop = args.entry_stop, pol = args.polarity, detRes = args.detRes, logistics = args.logistics)
     df = converter.df_epgg
 
+    print(df.head())
+    print(df.shape)
     df.to_pickle(args.out)
