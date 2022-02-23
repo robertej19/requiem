@@ -78,7 +78,8 @@ def readFile(fname):
 # entry_start (None or int) – The first entry to include. If None, start at zero. If negative, count from the end, like a Python slice.
 # entry_stop (None or int) – The first entry to exclude (i.e. one greater than the last entry to include). If None, stop at num_entries. If negative, count from the end, like a Python slice.
 
-def readEPGG(tree, entry_stop = None):
+def readEPGG(filename, entry_stop = None):
+    tree = readFile(filename)
     
     # data frames and their keys to read Z part
     df_electronGen = pd.DataFrame()
@@ -240,8 +241,7 @@ if __name__ == "__main__":
 
     fname_base = args.fname.split(".")[0]
 
-    tree = readFile(args.fname)
-    df_gen = readEPGG(tree)
+    df_gen = readEPGG(args.fname)
 
     print(df_gen.shape)
     print(df_gen.head(20))

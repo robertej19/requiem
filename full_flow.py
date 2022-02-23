@@ -8,6 +8,13 @@ from icecream import ic
 import matplotlib
 #matplotlib.use('Agg') 
 
+from convert_root_to_pickle import convert_GEN_NORAD_root_to_pkl
+from convert_root_to_pickle import convert_GEN_RAD_root_to_pkl
+from convert_root_to_pickle import convert_REC_RAD_root_to_pkl
+from convert_root_to_pickle import convert_REC_NORAD_root_to_pkl
+from convert_root_to_pickle import convert_real_to_pkl
+
+
 import matplotlib.pyplot as plt
 from copy import copy
 from utils.utils import dot
@@ -25,6 +32,7 @@ from utils.utils import getEnergy
 from utils.utils import readFile
 from utils import make_histos
 from utils import histo_plotting
+from utils import get_integrated_lumi
 import matplotlib as mpl
 
 from utils import filestruct
@@ -55,17 +63,31 @@ prefix = alpha/(8*np.pi)
 E = 10.6
 Clas6_Sim_BeamTime = 11922445
 Clas12_Sim_BeamTime = 16047494
-#Clas12_exp_luminosity = 5.5E40 #Fall 2018 inbending
-Clas12_exp_luminosity = 1.3978634388427737e+39 #Fall 2018 outbending
-Clas12_exp_luminosity = 4.651647453735352e+40 #Fall 2018 outbending large sample size
 
 fs = filestruct.fs()
 
-
-generator_type = "rad"
+#Analysis topology defintion
 generator_type = "norad"
-mag_config = "in"
-mag_config = "out"
+generator_type = "rad"
+mag_config = "inbending"
+mag_config = "outbending"
+
+#Exclusivity cuts
+
+#Analysis step definitions
+convert_roots = True
+if not convert_roots:
+    convert_root_exp = False
+    convert_root_rec = False
+    convert_root_gen = False
+    calc_lumi = False
+else:
+    convert_root_exp = False
+    convert_root_rec = False
+    convert_root_gen = True
+    calc_lumi = False
+
+
 
 datafile_base_dir = "/mnt/d/GLOBUS/CLAS12/APS2022/"
 roots_dir = "raw_roots/"
@@ -73,30 +95,67 @@ raw_data_dir = "pickled_data/"
 
 
 if generator_type == "rad":
-    if mag_config == "in":
+    rec_converter = convert_REC_RAD_root_to_pkl
+    gen_converter = convert_GEN_RAD_root_to_pkl
+    if mag_config == "inbending":
         path_to_exp_root = fs.path_to_exp_inbending_root
         path_to_rec_root = fs.path_to_rec_inbending_rad_root
         path_to_gen_root = fs.path_to_gen_inbending_rad_root
-    elif mag_config == "out":
+    elif mag_config == "outbending":
         path_to_exp_root = fs.path_to_exp_outbending_root
         path_to_rec_root = fs.path_to_rec_outbending_rad_root
         path_to_gen_root = fs.path_to_gen_outbending_rad_root
 elif generator_type == "norad":
-    if mag_config == "in":
+    rec_converter = convert_REC_NORAD_root_to_pkl
+    gen_converter = convert_GEN_NORAD_root_to_pkl
+    if mag_config == "inbending":
         path_to_exp_root = fs.path_to_exp_inbending_root
         path_to_rec_root = fs.path_to_rec_inbending_norad_root
         path_to_gen_root = fs.path_to_gen_inbending_norad_root
-    elif mag_config == "out":
+    elif mag_config == "outbending":
         path_to_exp_root = fs.path_to_exp_outbending_root
         path_to_rec_root = fs.path_to_rec_outbending_norad_root
         path_to_gen_root = fs.path_to_gen_outbending_norad_root
 
+exp_file_base = os.listdir(datafile_base_dir+roots_dir+path_to_exp_root)[0].split(".")[0]
+rec_file_base = os.listdir(datafile_base_dir+roots_dir+path_to_rec_root)[0].split(".")[0]
+gen_file_base = os.listdir(datafile_base_dir+roots_dir+path_to_gen_root)[0].split(".")[0]
 
-print(datafile_base_dir+roots_dir+path_to_exp_root)
-print(datafile_base_dir+roots_dir+path_to_rec_root)
-print(datafile_base_dir+roots_dir+path_to_gen_root)
+if convert_roots:
+    if convert_root_exp:
+        converter_exp = convert_real_to_pkl.root2pickle(
+            datafile_base_dir+roots_dir+path_to_exp_root+exp_file_base+".root",
+            pol=mag_config,
+            logistics=False)
 
+        df_exp  = converter_exp.df_epgg
+        df_exp.to_pickle(datafile_base_dir+raw_data_dir+exp_file_base+".pkl")
 
+    if convert_root_rec:
+        converter_rec = rec_converter.root2pickle(
+            datafile_base_dir+roots_dir+path_to_rec_root+rec_file_base+".root",
+            pol=mag_config)
+
+        df_rec = converter_rec.df
+        df_rec.to_pickle(datafile_base_dir+raw_data_dir+rec_file_base+".pkl")
+
+    if convert_root_gen:
+        df_gen = gen_converter.readEPGG(
+            datafile_base_dir+roots_dir+path_to_gen_root+gen_file_base+".root")
+
+        df_gen.to_pickle(datafile_base_dir+raw_data_dir+gen_file_base+".pkl")
+
+    if calc_lumi:
+        converter_exp = convert_real_to_pkl.root2pickle(
+        datafile_base_dir+roots_dir+path_to_exp_root+exp_file_base+".root",
+        pol=mag_config,
+        logistics=True)
+        df_exp_with_logi  = converter_exp.df_epgg
+        df_exp_with_logi.to_pickle(datafile_base_dir+raw_data_dir+exp_file_base+"_with_logi"+".pkl")
+        Clas12_exp_luminosity = get_integrated_lumi.get_integrated_lumi(df_exp_with_logi,bad_runs_list=[])[0]
+    else:
+        Clas12_exp_luminosity = 5.5e+40 if (mag_config == "inbending") else 4.651647453735352e+40
+    print(Clas12_exp_luminosity)
 
 sys.exit()
 
