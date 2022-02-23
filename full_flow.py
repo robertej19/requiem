@@ -61,18 +61,44 @@ Clas12_exp_luminosity = 4.651647453735352e+40 #Fall 2018 outbending large sample
 
 fs = filestruct.fs()
 
-""" 
-!! flow:
-###  make_dvpip_cuts
-###  bin_events
-## combined_dvpip_pickle
-## calc_xsec.py
-plot_across_t.py
 
-*** for presentation
-Make a ton of plots, basically
+generator_type = "rad"
+generator_type = "norad"
+mag_config = "in"
+mag_config = "out"
 
-"""
+datafile_base_dir = "/mnt/d/GLOBUS/CLAS12/APS2022/"
+roots_dir = "raw_roots/"
+raw_data_dir = "pickled_data/"
+
+
+if generator_type == "rad":
+    if mag_config == "in":
+        path_to_exp_root = fs.path_to_exp_inbending_root
+        path_to_rec_root = fs.path_to_rec_inbending_rad_root
+        path_to_gen_root = fs.path_to_gen_inbending_rad_root
+    elif mag_config == "out":
+        path_to_exp_root = fs.path_to_exp_outbending_root
+        path_to_rec_root = fs.path_to_rec_outbending_rad_root
+        path_to_gen_root = fs.path_to_gen_outbending_rad_root
+elif generator_type == "norad":
+    if mag_config == "in":
+        path_to_exp_root = fs.path_to_exp_inbending_root
+        path_to_rec_root = fs.path_to_rec_inbending_norad_root
+        path_to_gen_root = fs.path_to_gen_inbending_norad_root
+    elif mag_config == "out":
+        path_to_exp_root = fs.path_to_exp_outbending_root
+        path_to_rec_root = fs.path_to_rec_outbending_norad_root
+        path_to_gen_root = fs.path_to_gen_outbending_norad_root
+
+
+print(datafile_base_dir+roots_dir+path_to_exp_root)
+print(datafile_base_dir+roots_dir+path_to_rec_root)
+print(datafile_base_dir+roots_dir+path_to_gen_root)
+
+
+
+sys.exit()
 
 #run_identifiyer = "_CD_Included"
 #run_identifiyer = "_CD_ONLY"
@@ -81,7 +107,6 @@ Make a ton of plots, basically
 run_identifiyer = "_outbending"
 
 #### Naming constants:
-raw_data_dir = "pickled_data/"
 dvpip_data_dir = "pickled_dvpip/"
 binned_data_dir = "binned_dvpip/"
 final_xsec_dir = "final_data_files/"

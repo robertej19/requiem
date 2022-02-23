@@ -19,6 +19,23 @@ class fs:
 		self.q2bins =  [1.0,1.5,2.0,2.5,3.0,3.5,4.0,4.5,5.0,5.5,6.0,7.0,9.0,14.0]
 		self.tbins =  [0.09,0.15,0.2,0.3,0.4,0.6,1,1.5,2,3,4.5,6,12]
 
+		self.path_to_exp_outbending_root = "exp_outbend/"
+
+		self.path_to_rec_outbending_rad_root = "rad_outbend_rec/"
+		self.path_to_gen_outbending_rad_root = "rad_outbend_gen/"
+
+		self.path_to_rec_outbending_norad_root = "norad_outbend_rec/"
+		self.path_to_gen_outbending_norad_root = "norad_outbend_gen/"
+
+
+		self.path_to_exp_inbending_root = "exp_inbend/"
+
+		self.path_to_rec_inbending_rad_root = "norad_inbend_rec/"
+		self.path_to_gen_inbending_rad_root = "norad_inbend_gen/"
+
+		self.path_to_rec_inbending_norad_root = "rad_inbend_rec/"
+		self.path_to_gen_inbending_norad_root = "rad_inbend_gen/"
+
 
 
 		self.f18_inbending_total_lumi = 5.511802214933477e+40
