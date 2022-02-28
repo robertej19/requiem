@@ -36,6 +36,29 @@ prefix = alpha/(8*np.pi)
 E = 10.6
 
 
+df = pd.read_pickle("/mnt/d/GLOBUS/CLAS12/APS2022/pickled_data/1933_rad_Fall_2018_Outbending_100_recon.pkl")#1933_rad_Fall_2018_Outbending_100_gen.pkl")
+for coln in df.columns:
+    print(coln)
+
+#y_data = df["GenPtheta"]
+#x_data = df["Nmg"]
+#x_data = df["Genphi1"]
+#y_data = df["Ptheta"]
+#x_data = df["phi1"]
+var_names = ["phi","theta"]
+vars = ["vz"]
+ranges = None
+#ranges = [-8,2,100]
+#ranges = [[0,360,100],[0,100,100]]
+make_histos.plot_2dhist(x_data,y_data,var_names,ranges,colorbar=True,
+            saveplot=False,pics_dir="none",plot_title="none",logger=False,first_label="rad",
+            filename="ExamplePlot",units=["",""],extra_data=None)
+
+# make_histos.plot_1dhist(x_data,vars,ranges=ranges,second_x="none",logger=False,first_label="norad",second_label="norad",
+#             saveplot=False,pics_dir="none",plot_title="none",first_color="blue",sci_on=False)
+
+
+sys.exit()
 # #df1 = pd.read_pickle("final_data_files/full_xsection_Sangbaek_rad_CD_sim.pkl")
 # df2 = pd.read_pickle("final_data_files/full_xsection_CD_Included.pkl")
 

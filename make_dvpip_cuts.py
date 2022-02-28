@@ -59,7 +59,10 @@ def makeDVpi0(df_epgg):
         cut_etheta = df_epgg.loc[:, "Etheta"] > 0.8
         cut_ep = df_epgg.loc[:, "Ep"] < 77
 
+        #cut_genQ2 = df_epgg.loc[:, "GenQ2"] < 100  # mmep
+        #cut_genW = df_epgg.loc[:, "GenW"] < 1.975  # mmep
 
+        
 
         # Exclusivity cuts
         cut_mmep = df_epgg.loc[:, "MM2_ep"] < 0.1  # mmep
