@@ -79,12 +79,14 @@ def bin_df(df_in,df_type="real"):
                     mean_xb =    df_qxtp["{}xB".format(prefix)].mean(axis=0)
                     mean_t1 =    df_qxtp["{}t1".format(prefix)].mean(axis=0)
                     mean_phi =  df_qxtp["{}phi1".format(prefix)].mean(axis=0)
-
-                    num_counts.append([qmin,xmin,tmin,pmin,mean_q2,mean_xb,mean_t1,mean_phi,len(df_qxtp.index)])
-
+                    mean_y =  df_qxtp["{}y".format(prefix)].mean(axis=0)
 
 
-    df_minibin = pd.DataFrame(num_counts, columns = ['qmin','xmin','tmin','pmin','qave','xave','tave','pave',prefix+'counts'])
+                    num_counts.append([qmin,xmin,tmin,pmin,mean_q2,mean_y,mean_xb,mean_t1,mean_phi,len(df_qxtp.index)])
+
+
+
+    df_minibin = pd.DataFrame(num_counts, columns = ['qmin','xmin','tmin','pmin','qave','yave','xave','tave','pave',prefix+'counts'])
     print("Total number of binned events: {}".format(df_minibin[prefix+'counts'].sum()))
     print("Total number of original events: {}".format(total_num))
     return df_minibin

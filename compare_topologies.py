@@ -223,50 +223,6 @@ bin_gen = True
 calc_xsection = True
 plot_reduced_xsec_and_fit = True
 
-if not convert_roots:
-    convert_root_exp = False
-    convert_root_rec = False
-    convert_root_gen = False
-    calc_lumi = False
-else:
-    convert_root_exp = True
-    convert_root_rec = True
-    convert_root_gen = True
-    calc_lumi = False
-
-if not plot_initial_distros:
-    plot_initial_exp_distros = False
-    plot_initial_rec_distros = False
-    plot_initial_rec_exp_distros = False
-    plot_initial_gen_distros = False
-else:
-    plot_initial_exp_distros = True
-    plot_initial_rec_distros = True
-    plot_initial_rec_exp_distros = True
-    plot_initial_gen_distros = False
-
-if not make_exclusive_cuts:
-    make_ex_cut_exp = False
-    make_ex_cut_gen = False
-    make_ex_cut_rec = False
-else:
-    make_ex_cut_exp = True
-    make_ex_cut_gen = True
-    make_ex_cut_rec = True
-
-
-if not plot_final_distros:
-    plot_final_exp_distros = False
-    plot_final_rec_distros = False
-    plot_final_rec_exp_distros = False
-    plot_final_gen_distros = False
-else:
-    plot_final_exp_distros = True
-    plot_final_rec_distros = True
-    plot_final_rec_exp_distros = True
-    plot_final_gen_distros = False
-
-
 ########################################################################
 ########################################################################
 ########################################################################
@@ -302,273 +258,6 @@ final_output_name = "full_xsection_"+run_identifiyer
 
 exp_common_name = "fall 2018 {} exp {}".format(mag_config,unique_identifyer)
 rec_common_name = "sim rec {} {} {}".format(mag_config,generator_type,unique_identifyer)
-
-
-########################################################################
-########################################################################
-########################################################################
-#Choose functions from config parameters
-if generator_type == "rad":
-    rec_converter = convert_REC_RAD_root_to_pkl
-    gen_converter = convert_GEN_RAD_root_to_pkl
-    if mag_config == "inbending":
-        path_to_exp_root = fs.path_to_exp_inbending_root
-        path_to_rec_root = fs.path_to_rec_inbending_rad_root
-        path_to_gen_root = fs.path_to_gen_inbending_rad_root
-    elif mag_config == "outbending":
-        path_to_exp_root = fs.path_to_exp_outbending_root
-        path_to_rec_root = fs.path_to_rec_outbending_rad_root
-        path_to_gen_root = fs.path_to_gen_outbending_rad_root
-elif generator_type == "norad":
-    rec_converter = convert_REC_NORAD_root_to_pkl
-    gen_converter = convert_GEN_NORAD_root_to_pkl
-    if mag_config == "inbending":
-        path_to_exp_root = fs.path_to_exp_inbending_root
-        path_to_rec_root = fs.path_to_rec_inbending_norad_root
-        path_to_gen_root = fs.path_to_gen_inbending_norad_root
-    elif mag_config == "outbending":
-        path_to_exp_root = fs.path_to_exp_outbending_root
-        path_to_rec_root = fs.path_to_rec_outbending_norad_root
-        path_to_gen_root = fs.path_to_gen_outbending_norad_root
-
-exp_file_base = os.listdir(datafile_base_dir+roots_dir+path_to_exp_root)[0].split(".")[0]
-rec_file_base = os.listdir(datafile_base_dir+roots_dir+path_to_rec_root)[0].split(".")[0]
-gen_file_base = os.listdir(datafile_base_dir+roots_dir+path_to_gen_root)[0].split(".")[0]
-Clas12_exp_luminosity = 5.5e+40 if (mag_config == "inbending") else 4.651647453735352e+40
-
-########################################################################
-########################################################################
-########################################################################
-#Convert root to pkl
-if convert_roots:
-    if convert_root_exp:
-        converter_exp = convert_real_to_pkl.root2pickle(
-            datafile_base_dir+roots_dir+path_to_exp_root+exp_file_base+".root",
-            pol=mag_config,
-            logistics=False)
-
-        df_exp  = converter_exp.df_epgg
-        df_exp.to_pickle(datafile_base_dir+raw_data_dir+exp_file_base+".pkl")
-
-    if convert_root_rec:
-        converter_rec = rec_converter.root2pickle(
-            datafile_base_dir+roots_dir+path_to_rec_root+rec_file_base+".root",
-            pol=mag_config)
-
-        df_rec = converter_rec.df
-        df_rec.to_pickle(datafile_base_dir+raw_data_dir+rec_file_base+".pkl")
-
-    if convert_root_gen:
-        df_gen = gen_converter.readEPGG(
-            datafile_base_dir+roots_dir+path_to_gen_root+gen_file_base+".root")
-
-        df_gen.to_pickle(datafile_base_dir+raw_data_dir+gen_file_base+".pkl")
-
-    if calc_lumi:
-        converter_exp = convert_real_to_pkl.root2pickle(
-        datafile_base_dir+roots_dir+path_to_exp_root+exp_file_base+".root",
-        pol=mag_config,
-        logistics=True)
-        df_exp_with_logi  = converter_exp.df_epgg
-        df_exp_with_logi.to_pickle(datafile_base_dir+raw_data_dir+exp_file_base+"_with_logi"+".pkl")
-        Clas12_exp_luminosity = get_integrated_lumi.get_integrated_lumi(df_exp_with_logi,bad_runs_list=[])[0]
-        print(Clas12_exp_luminosity)
-
-
-if make_exclusive_cuts:
-    #### APPLY EXCLUSIVITY CUTS
-    print("Applying exclusive cuts to dataframe...")
-
-    ########################################
-    if make_ex_cut_exp:
-        try:
-            df_exp
-        except NameError:
-            df_exp = pd.read_pickle(datafile_base_dir+raw_data_dir+exp_file_base+".pkl")
-
-        df_exp_epgg = df_exp
-
-        df_exp_epgg.loc[:,'y'] = df_exp_epgg['nu']/10.604
-        
-        if plot_initial_exp_distros:
-            title_dir = datafile_base_dir+initial_distros_dir+initial_exp_plots_dir
-            histo_plotting.make_all_histos(df_exp_epgg,datatype="exp",hists_2d=True,hists_1d=True,
-                    first_label='exp',hists_overlap=False,saveplots=True,output_dir = title_dir)
-
-        print("There are {} exp epgg events".format(df_exp_epgg.shape[0]))
-        df_dvpip_exp = makeDVpi0(df_exp_epgg)
-        df_dvpip_exp.to_pickle("{}/{}_dvpip_exp.pkl".format(datafile_base_dir+dvpip_data_dir,exp_file_base))
-        print("There are {} exp dvpip events".format(df_dvpip_exp.shape[0]))
-
-        if plot_final_exp_distros:
-            title_dir = datafile_base_dir+final_distros_dir+final_exp_plots_dir
-            histo_plotting.make_all_histos(df_dvpip_exp,datatype="exp",hists_2d=True,hists_1d=True,
-                    first_label='exp',hists_overlap=False,saveplots=True,output_dir = title_dir)
-
-    ########################################
-    if make_ex_cut_rec:
-        try:
-            df_rec
-        except NameError:
-            df_rec = pd.read_pickle(datafile_base_dir+raw_data_dir+rec_file_base+".pkl")
-
-        df_rec_epgg = df_rec
-        df_rec_epgg.loc[:,'y'] = df_rec_epgg['nu']/10.604
-
-        
-        if plot_initial_rec_distros:
-            title_dir = datafile_base_dir+initial_distros_dir+initial_rec_plots_dir
-            histo_plotting.make_all_histos(df_rec_epgg,datatype="rec",hists_2d=True,hists_1d=True,
-                    first_label='rec',hists_overlap=False,saveplots=True,output_dir = title_dir)
-
-        print("There are {} rec epgg events".format(df_rec_epgg.shape[0]))
-        df_dvpip_rec = makeDVpi0(df_rec_epgg)
-        df_dvpip_rec.to_pickle("{}/{}_dvpip_rec.pkl".format(datafile_base_dir+dvpip_data_dir,rec_file_base))
-
-        print("There are {} rec dvpip events".format(df_dvpip_rec.shape[0]))
-
-        if plot_final_rec_distros:
-            title_dir = datafile_base_dir+final_distros_dir+final_rec_plots_dir
-            histo_plotting.make_all_histos(df_dvpip_rec,datatype="rec",hists_2d=True,hists_1d=True,
-                    first_label='rec',hists_overlap=False,saveplots=True,output_dir = title_dir)
-
-
-    if plot_initial_rec_exp_distros:
-        title_dir = datafile_base_dir+initial_distros_dir+initial_rec_exp_plots_dir
-        histo_plotting.make_all_histos(df_exp_epgg,datatype="exp",hists_2d=False,hists_1d=False,hists_overlap=True,saveplots=True,output_dir = title_dir,
-                                        df_2=df_rec_epgg,first_label=exp_common_name,second_label=rec_common_name)
-    if plot_final_rec_exp_distros:
-        title_dir = datafile_base_dir+final_distros_dir+final_rec_exp_plots_dir
-        histo_plotting.make_all_histos(df_dvpip_exp,datatype="rec",hists_2d=False,hists_1d=False,hists_overlap=True,saveplots=True,output_dir = title_dir,
-                                        df_2=df_dvpip_rec,first_label=exp_common_name,second_label=rec_common_name)
-
-
-    ########################################
-    if make_ex_cut_gen:
-        try:
-            df_gen
-        except NameError:
-            df_gen = pd.read_pickle(datafile_base_dir+raw_data_dir+gen_file_base+".pkl")
-
-        df_gen_epgg = df_gen
-
-        
-        if plot_initial_gen_distros:
-            title_dir = datafile_base_dir+initial_distros_dir+initial_gen_plots_dir
-            histo_plotting.make_all_histos(df_gen_epgg,datatype="Gen",hists_2d=True,hists_1d=True,
-                    first_label='gen',hists_overlap=False,saveplots=True,output_dir = title_dir)
-
-        print("There are {} gen epgg events".format(df_gen_epgg.shape[0]))
-        df_dvpip_gen = df_gen_epgg.query("GenQ2>1 and GenW>2")
-        df_dvpip_gen.to_pickle("{}/{}_dvpip_gen.pkl".format(datafile_base_dir+dvpip_data_dir,gen_file_base))
-
-        print("There are {} gen dvpip events".format(df_dvpip_gen.shape[0]))
-
-        if plot_final_gen_distros:
-            title_dir = datafile_base_dir+final_distros_dir+final_gen_plots_dir
-            histo_plotting.make_all_histos(df_dvpip_gen,datatype="Gen",hists_2d=True,hists_1d=True,
-                    first_label='gen',hists_overlap=False,saveplots=True,output_dir = title_dir)
-
-
-
-
-#### BIN EVENTS
-if bin_all_events:
-    print("Binning events...")
-
-    if bin_gen:
-        df_dvpip_gen = pd.read_pickle("{}/{}_dvpip_gen.pkl".format(datafile_base_dir+dvpip_data_dir,gen_file_base))
-
-        df_gen_binned = bin_df(df_dvpip_gen, "Gen")
-        df_gen_binned.to_pickle(datafile_base_dir+binned_data_dir + gen_file_base+"_binned"+".pkl")
-        df_gen = df_gen_binned
-    else:
-        df_gen = pd.read_pickle(datafile_base_dir+binned_data_dir + gen_file_base+"_binned"+".pkl")
-
-    df_dvpip_exp = pd.read_pickle("{}/{}_dvpip_exp.pkl".format(datafile_base_dir+dvpip_data_dir,exp_file_base))
-    df_dvpip_rec = pd.read_pickle("{}/{}_dvpip_rec.pkl".format(datafile_base_dir+dvpip_data_dir,rec_file_base))
-
-    df_exp_binned = bin_df(df_dvpip_exp, "exp")
-    df_rec_binned = bin_df(df_dvpip_rec, "rec")
-
-
-    df_exp_binned.to_pickle(datafile_base_dir+binned_data_dir+exp_file_base+run_identifiyer+"_binned"+".pkl")
-    df_rec_binned.to_pickle(datafile_base_dir+binned_data_dir+rec_file_base+run_identifiyer+"_binned"+".pkl")
-
-    df_exp = df_exp_binned
-    df_rec = df_rec_binned
-
-else:
-    df_gen = pd.read_pickle(datafile_base_dir+binned_data_dir + gen_file_base+"_binned"+".pkl")
-    df_exp = pd.read_pickle(datafile_base_dir+binned_data_dir+exp_file_base+run_identifiyer+"_binned"+".pkl")
-    df_rec = pd.read_pickle(datafile_base_dir+binned_data_dir+rec_file_base+run_identifiyer+"_binned"+".pkl")
-                            
-
-if calc_xsection:
-    space_clas6 = False
-    if space_clas6:
-        df_clas6 = pd.read_pickle(binned_data_dir + "xs_clas6_binned.pkl")
-        df_clas6 = expand_clas6(df_clas6)
-        df_clas6.to_pickle(base_dir + "xs_clas6_binned_expanded.pkl")
-    else:
-        df_clas6 = pd.read_pickle(binned_data_dir + "xs_clas6_binned_expanded.pkl")
-
-
-
-    df_exp = df_exp.rename(columns={"qave": "qave_exp", "xave": "xave_exp","tave": "tave_exp", "pave": "pave_exp","counts":"counts_exp"})
-    df_rec = df_rec.rename(columns={"qave": "qave_rec", "xave": "xave_rec","tave": "tave_rec", "pave": "pave_rec","counts":"counts_rec"})
-    df_gen = df_gen.rename(columns={'qave': 'qave_gen', 'xave': 'xave_gen', 'tave': 'tave_gen', 'pave': 'pave_gen', 'Gencounts': 'counts_gen'})
-
-
-    df_merged_1 = pd.merge(df_exp,df_rec,how='inner', on=['qmin','xmin','tmin','pmin'])
-    df_merged_2 = pd.merge(df_merged_1,df_gen,how='inner', on=['qmin','xmin','tmin','pmin'])
-    df_merged_total = pd.merge(df_merged_2,df_clas6,how='inner', on=['qmin','xmin','tmin','pmin'])
-
-    print(df_merged_total)
-    df_merged_total.to_pickle(datafile_base_dir+binned_data_dir + merged_data_name+".pkl")
-
-
-    # Calc x-section:
-
-    base_dir = datafile_base_dir+binned_data_dir
-    df = df_merged_total
-
-
-    df.loc[:,"gamma_exp"] = get_gamma(df["xave_exp"],df["qave_exp"],10.604)[0] #get_gamma((dfout["xmin"]+dfout["xmax"])/2,(dfout["qmin"]+dfout["qmax"])/2)[0]
-    df.loc[:,"epsi_exp"] =  get_gamma(df["xave_exp"],df["qave_exp"],10.604)[1] #get_gamma((dfout["xmin"]+dfout["xmax"])/2,(dfout["qmin"]+dfout["qmax"])/2)[1]
-
-    df.loc[:,"binvol"] = (df["qmax"]-df["qmin"])*(df["xmax"]-df["xmin"])*(df["tmax"]-df["tmin"])*(df["pmax"]-df["pmin"])*3.14159/180
-
-    df.loc[:,"acc_corr"] = df["counts_rec"]/df["counts_gen"]
-
-    df.loc[:,"xsec"] = df["counts_exp"]/Clas12_exp_luminosity/df["binvol"]
-    df.loc[:,"xsec_corr"] = df["xsec"]/df["acc_corr"]
-    df.loc[:,"xsec_corr_red"] = df["xsec_corr"]/df["gamma_exp"]
-    df.loc[:,"xsec_corr_red_nb"] = df["xsec_corr_red"]*1E33
-
-    df.loc[:,"xsec_ratio_exp"] = df["xsec_corr_red_nb"]/df["dsdtdp"]
-
-
-    df.loc[:,"uncert_counts_exp"] = np.sqrt(df["counts_exp"])
-    df.loc[:,"uncert_counts_rec"] = np.sqrt(df["counts_rec"])
-    df.loc[:,"uncert_counts_gen"] = np.sqrt(df["counts_gen"])
-
-    df.loc[:,"uncert_xsec"] = df["uncert_counts_exp"]/df["counts_exp"]*df["xsec"]
-    df.loc[:,"uncert_acc_corr"] = np.sqrt(  np.square(df["uncert_counts_rec"]/df["counts_rec"]) + np.square(df["uncert_counts_gen"]/df["counts_gen"]))*df["acc_corr"]
-    df.loc[:,"uncert_xsec_corr_red_nb"] = np.sqrt(  np.square(df["uncert_xsec"]/df["xsec"]) + np.square(df["uncert_acc_corr"]/df["acc_corr"]))*df["xsec_corr_red_nb"]
-
-    df.loc[:,"uncert_xsec_ratio_exp"] = np.sqrt(  np.square(df["uncert_xsec_corr_red_nb"]/df["xsec_corr_red_nb"]) + np.square(df["stat"]/df["dsdtdp"]) + np.square(df["sys"]/df["dsdtdp"]) )*df["xsec_ratio_exp"]
-
-
-
-    df.to_pickle(datafile_base_dir + final_xsec_dir+final_output_name+".pkl")
-    try:
-        df.to_csv(datafile_base_dir + final_xsec_dir+final_output_name+".csv")
-    except:
-        print("Error saving CSV, continuing")
-
-    print("Output pickle file save to {}".format(datafile_base_dir + final_xsec_dir+final_output_name+".pkl"))
-
 
 
 if plot_reduced_xsec_and_fit:
@@ -627,24 +316,47 @@ if plot_reduced_xsec_and_fit:
     xmax = 360
     xspace = np.linspace(0, xmax, 1000)
 
-    df = pd.read_pickle(datafile_base_dir + final_xsec_dir+final_output_name+".pkl")
+    df_inbending = pd.read_pickle(datafile_base_dir + final_xsec_dir+"full_xsection_inbending_rad_all.pkl")
+    df_outbending = pd.read_pickle(datafile_base_dir + final_xsec_dir+"full_xsection_outbending_rad_all.pkl")
+
                                         
     df_sf_binned = pd.read_pickle('final_data_files/clas6_structure_funcs_binned.pkl')
     df_sf_binned = df_sf_binned.apply(pd.to_numeric)
 
 
-    df.loc[:,"xsec_corr_nb_gamma"] = df["xsec_corr"]*1E33/df["gamma_exp"]
+    #inbending
 
-    df.loc[:,"tot_clas6_uncert"] = np.sqrt(np.square(df["stat"]/df["dsdtdp"]) + np.square(df["sys"]/df["dsdtdp"]))*df["dsdtdp"]
+    df_inbending.loc[:,"xsec_corr_nb_gamma"] = df_inbending["xsec_corr"]*1E33/df_inbending["gamma_exp"]
 
-    df.loc[:,"epsi_clas6"] = get_gamma(df["x"],df["q"],5.776)[1] #get_gamma((dfout["xmin"]+dfout["xmax"])/2,(dfout["qmin"]+dfout["qmax"])/2)[1]
+    df_inbending.loc[:,"tot_clas6_uncert"] = np.sqrt(np.square(df_inbending["stat"]/df_inbending["dsdtdp"]) + np.square(df_inbending["sys"]/df_inbending["dsdtdp"]))*df_inbending["dsdtdp"]
 
-    df.loc[:,"uncert_xsec_corr_nb_gamma"] = np.sqrt(  np.square(df["uncert_xsec"]/df["xsec"]) + np.square(df["uncert_acc_corr"]/df["acc_corr"]))*df["xsec_corr_nb_gamma"]
-    df.loc[:,"c_12_uncert_ratio"] = df['uncert_xsec_corr_nb_gamma']/df['xsec_corr_nb_gamma']
+    df_inbending.loc[:,"epsi_clas6"] = get_gamma(df_inbending["x"],df_inbending["q"],5.776)[1] #get_gamma((df_inbendingout["xmin"]+df_inbendingout["xmax"])/2,(df_inbendingout["qmin"]+df_inbendingout["qmax"])/2)[1]
 
-    df.loc[(df.acc_corr < 0.01),'xsec_corr_nb_gamma']=np.nan
+    df_inbending.loc[:,"uncert_xsec_corr_nb_gamma"] = np.sqrt(  np.square(df_inbending["uncert_xsec"]/df_inbending["xsec"]) + np.square(df_inbending["uncert_acc_corr"]/df_inbending["acc_corr"]))*df_inbending["xsec_corr_nb_gamma"]
+    df_inbending.loc[:,"c_12_uncert_ratio"] = df_inbending['uncert_xsec_corr_nb_gamma']/df_inbending['xsec_corr_nb_gamma']
+
+    df_inbending.loc[(df_inbending.acc_corr < 0.01),'xsec_corr_nb_gamma']=np.nan
+
+
+    #outbending
+
+    df_outbending.loc[:,"xsec_corr_nb_gamma"] = df_outbending["xsec_corr"]*1E33/df_outbending["gamma_exp"]
+
+    df_outbending.loc[:,"tot_clas6_uncert"] = np.sqrt(np.square(df_outbending["stat"]/df_outbending["dsdtdp"]) + np.square(df_outbending["sys"]/df_outbending["dsdtdp"]))*df_outbending["dsdtdp"]
+
+    df_outbending.loc[:,"epsi_clas6"] = get_gamma(df_outbending["x"],df_outbending["q"],5.776)[1] #get_gamma((df_outbendingout["xmin"]+df_outbendingout["xmax"])/2,(df_outbendingout["qmin"]+df_outbendingout["qmax"])/2)[1]
+
+    df_outbending.loc[:,"uncert_xsec_corr_nb_gamma"] = np.sqrt(  np.square(df_outbending["uncert_xsec"]/df_outbending["xsec"]) + np.square(df_outbending["uncert_acc_corr"]/df_outbending["acc_corr"]))*df_outbending["xsec_corr_nb_gamma"]
+    df_outbending.loc[:,"c_12_uncert_ratio"] = df_outbending['uncert_xsec_corr_nb_gamma']/df_outbending['xsec_corr_nb_gamma']
+
+    df_outbending.loc[(df_outbending.acc_corr < 0.01),'xsec_corr_nb_gamma']=np.nan
+
+
+
+
 
     q2bins,xBbins, tbins, phibins = fs.q2bins, fs.xBbins, fs.tbins, fs.phibins
+
 
     qrange = [q2bins[0], q2bins[-1]]
     xBrange = [xBbins[0], xBbins[-1]]
@@ -653,7 +365,7 @@ if plot_reduced_xsec_and_fit:
 
     sf_data_vals = []
 
-    reduced_plot_dir = datafile_base_dir+reduced_xsection_plots_dir+run_identifiyer+"/"
+    reduced_plot_dir = datafile_base_dir+reduced_xsection_plots_dir+run_identifiyer+ "in_out_comp_/"
     if not os.path.exists(reduced_plot_dir):
         os.makedirs(reduced_plot_dir)
 
@@ -664,32 +376,48 @@ if plot_reduced_xsec_and_fit:
 
                 query = "qmin == {} and xmin == {} and tmin == {}".format(qmin,xmin,tmin)
 
-                df_small = df.query(query)
+                df_inbending_small = df_inbending.query(query)
+                df_outbending_small = df_outbending.query(query)
+
                 df_sf_binned_small = df_sf_binned.query(query)
 
-                df_check = df_small[df_small["xsec_corr_nb_gamma"].notnull()]
+                df_inbending_check = df_inbending_small[df_inbending_small["xsec_corr_nb_gamma"].notnull()]
+                df_outbending_check = df_outbending_small[df_outbending_small["xsec_corr_nb_gamma"].notnull()]
 
-                if np.isnan(df_sf_binned_small["tel"].values[0]) or df_check.empty or df_small[df_small["xsec_corr_nb_gamma"].notnull()].shape[0]<3:
+
+                if np.isnan(df_sf_binned_small["tel"].values[0]) or (df_inbending_check.empty or df_outbending_check.empty) or (df_inbending_small[df_inbending_small["xsec_corr_nb_gamma"].notnull()].shape[0]<3 or df_outbending_small[df_outbending_small["xsec_corr_nb_gamma"].notnull()].shape[0]<3):
                     pass
                 else:
-                    epsi_mean_c6 = df_small["epsi_clas6"].mean()
+                    epsi_mean_c6 = df_inbending_small["epsi_clas6"].mean()
 
-                    epsi_mean_c12 = df_small["epsi_exp"].mean()
-                    mean_xsec_uncer_ratio_c12 = df_small['c_12_uncert_ratio'].mean()
+                    epsi_mean_c12 = df_inbending_small["epsi_exp"].mean()
+                    epsi_mean_c12_out = df_outbending_small["epsi_exp"].mean()
+
+                    mean_xsec_uncer_ratio_c12 = df_inbending_small['c_12_uncert_ratio'].mean()
+                    mean_xsec_uncer_ratio_c12_out = df_outbending_small['c_12_uncert_ratio'].mean()
 
 
-                    binscenters_c12 = df_small["pave_exp"]
-                    data_entries_c12 = df_small["xsec_corr_nb_gamma"]
-                    sigma_c12 = df_small["uncert_xsec_corr_nb_gamma"]
-                    binscenters = df_small["p"]
-                    data_entries = df_small["dsdtdp"]
-                    sigma = df_small["tot_clas6_uncert"]
+
+                    binscenters_c12 = df_inbending_small["pave_exp"]
+                    data_entries_c12 = df_inbending_small["xsec_corr_nb_gamma"]
+                    sigma_c12 = df_inbending_small["uncert_xsec_corr_nb_gamma"]
+
+                    binscenters_c12_out = df_outbending_small["pave_exp"]
+                    data_entries_c12_out = df_outbending_small["xsec_corr_nb_gamma"]
+                    sigma_c12_out = df_outbending_small["uncert_xsec_corr_nb_gamma"]
+
+                    binscenters = df_inbending_small["p"]
+                    data_entries = df_inbending_small["dsdtdp"]
+                    sigma = df_inbending_small["tot_clas6_uncert"]
 
                     x = binscenters
                     y = data_entries
 
                     def resid_weighted_c12(pars):
                         return (((y-fit_function(x,pars))**2)/sigma_c12).sum()
+
+                    def resid_weighted_c12_out(pars):
+                        return (((y-fit_function(x,pars))**2)/sigma_c12_out).sum()
 
                     def constr0(pars):
                         return fit_function(0,pars)
@@ -718,6 +446,24 @@ if plot_reduced_xsec_and_fit:
                     b_err = np.sqrt(pcov[1][1])#*qmod
                     c_err = np.sqrt(pcov[2][2])#*qmod
 
+                    x = binscenters_c12_out
+                    y = data_entries_c12_out
+                    valid = ~(np.isnan(x) | np.isnan(y))
+
+                    popt_0, pcov = curve_fit(fit_function, xdata=x[valid], ydata=y[valid], p0=[100,-60,-11],
+                        sigma=sigma_c12_out[valid], absolute_sigma=True)
+
+                    popt, pcov = curve_fit(fit_function, xdata=x[valid], ydata=y[valid], p0=[popt_0[0],popt_0[1],popt_0[2]],
+                                sigma=sigma_c12_out[valid], absolute_sigma=True)
+
+                    a0,b0,c0 = popt[0],popt[1],popt[2]
+                    
+                    a0_err = np.sqrt(pcov[0][0])#*qmod
+                    b0_err = np.sqrt(pcov[1][1])#*qmod
+                    c0_err = np.sqrt(pcov[2][2])#*qmod
+
+
+
                     ###A +    Bcos(2x) + Ccos(x)
                     ###TEL +   ep*TT   + sqr*LT
                     
@@ -732,21 +478,33 @@ if plot_reduced_xsec_and_fit:
                     fit_y_data_weighted = fit_function(xspace,rev_a,rev_b,rev_c)
 
                     a_c12,b_c12,c_c12 = a,b,c 
+                    a_c12_out,b_c12_out,c_c12_out = a0,b0,c0 
+
 
                     tel_c12 = a_c12*6.28
                     tt_c12 = b_c12/epsi_mean_c12*6.28
                     lt_c12 = c_c12/np.sqrt(2*epsi_mean_c12*(1+epsi_mean_c12))*6.28
 
+                    tel_c12_out = a_c12_out*6.28
+                    tt_c12_out = b_c12_out/epsi_mean_c12_out*6.28
+                    lt_c12_out = c_c12_out/np.sqrt(2*epsi_mean_c12_out*(1+epsi_mean_c12_out))*6.28
+
                     tel_c12_err = tel_c12*a_err/a
                     tt_c12_err = tt_c12*b_err/b
                     lt_c12_err = lt_c12*c_err/c
 
+                    tel_c12_out_err = tel_c12_out*a0_err/a0
+                    tt_c12_out_err = tt_c12_out*b0_err/b0
+                    lt_c12_out_err = lt_c12_out*c0_err/c0
+
                     fit_y_data_weighted_new_c12 = fit_function(xspace, a_c12,b_c12,c_c12)
+                    fit_y_data_weighted_new_c12_out = fit_function(xspace, a_c12_out,b_c12_out,c_c12_out)
 
 
-                    q_mean_c12 = df_small['qave_exp'].mean()
-                    x_mean_c12 = df_small['xave_exp'].mean()
-                    t_mean_c12 = df_small['tave_exp'].mean()
+
+                    q_mean_c12 = df_inbending_small['qave_exp'].mean()
+                    x_mean_c12 = df_inbending_small['xave_exp'].mean()
+                    t_mean_c12 = df_inbending_small['tave_exp'].mean()
 
                     sf_data_vals.append([df_sf_binned_small['q'].values[0],
                         df_sf_binned_small['x'].values[0],
@@ -770,20 +528,24 @@ if plot_reduced_xsec_and_fit:
 
                     fig, ax = plt.subplots(figsize =(14, 10)) 
 
-                    plt.errorbar(binscenters, data_entries, yerr=sigma, color="red",fmt="o",label="CLAS6 Data")
+                    plt.errorbar(binscenters, data_entries, yerr=sigma, color="red",fmt="o")#,label="CLAS6 Data")
 
-                    plt.errorbar(binscenters_c12, data_entries_c12, yerr=sigma_c12, color="blue",fmt="x",label="CLAS12 Data")
+                    plt.errorbar(binscenters_c12, data_entries_c12, yerr=sigma_c12, color="blue",fmt="x")#,label="CLAS12 Data in.")
+                    plt.errorbar(binscenters_c12_out, data_entries_c12_out, yerr=sigma_c12_out, color="green",fmt="x")#,label="CLAS12 Data out.")
+
 
                     plt.rcParams["font.size"] = "20"
 
                     fit2, = ax.plot(xspace, fit_y_data_weighted, color='red', linewidth=2.5, label='CLAS6 Fit:         t+l:{:.0f} tt:{:.0f} lt:{:.0f}'.format(pub_tel,pub_tt,pub_lt))
-                    fit4, = ax.plot(xspace, fit_y_data_weighted_new_c12, color='blue', linewidth=2.5, label='CLAS12 Fit: t+l:{:.0f} tt:{:.0f} lt:{:.0f}'.format(tel_c12,tt_c12,lt_c12))
+                    fit4, = ax.plot(xspace, fit_y_data_weighted_new_c12, color='blue', linewidth=2.5, label='CLAS12 in.: t+l:{:.0f} tt:{:.0f} lt:{:.0f}'.format(tel_c12,tt_c12,lt_c12))
+                    fit6, = ax.plot(xspace, fit_y_data_weighted_new_c12_out, color='green', linewidth=2.5, label='CLAS12 out.: t+l:{:.0f} tt:{:.0f} lt:{:.0f}'.format(tel_c12_out,tt_c12_out,lt_c12_out))
                     
                     ax.legend(loc="best")
                     ax.set_xlabel("Phi")  
                     ax.set_ylabel('Reduced Cross Section (nb/GeV$^2$)')  
                     title = "Cross Section Fit Over Phi, Q$^2$ = {:.2f}, x$_B$ = {:.2f}, t = {:.1f}".format(df_sf_binned_small['q'].values[0],df_sf_binned_small['x'].values[0],df_sf_binned_small['t'].values[0])
                     plt.title(title)
+
 
                     plt.savefig(reduced_plot_dir+title.replace("$","").replace(".","").replace("^","").replace(" ","").replace("=","").replace(",","_")+".png")
 
@@ -794,6 +556,6 @@ if plot_reduced_xsec_and_fit:
                                     'qmax','xmax','tel_c12_err','tt_c12_err','lt_c12_err'])
 
 
-    df_out.to_pickle(datafile_base_dir + final_xsec_dir+"struct_funcs.pkl")
+    df_out.to_pickle(datafile_base_dir + final_xsec_dir+"struct_funcs_combined.pkl")
 
 
