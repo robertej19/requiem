@@ -63,7 +63,7 @@ def bin_df(df_in,df_type="real"):
         df_q = df.query(query)
 
         for xmin,xmax in zip(xBbins[0:-1],xBbins[1:]):
-            print("        xB bin: {} to {}".format(xmin,xmax))
+            #print("        xB bin: {} to {}".format(xmin,xmax))
             query = "{}xB > {} and {}xB < {}".format(prefix,xmin,prefix,xmax)
             df_qx = df_q.query(query)
 

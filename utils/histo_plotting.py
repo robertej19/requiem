@@ -7,7 +7,7 @@ import json
 
     
 def make_all_histos(df,datatype="Recon",hists_2d=False,hists_1d=False,hists_overlap=False,saveplots=False,
-                output_dir = "pics/",df_2=None,first_label="first",second_label="second"):
+                output_dir = "pics/",df_2=None,first_label="first",second_label="second",plot_title_identifiyer=""):
 
     var_prefix = ""
     if datatype=="Gen":
@@ -118,7 +118,7 @@ def make_all_histos(df,datatype="Recon",hists_2d=False,hists_1d=False,hists_over
             if not xvals_1.empty and not xvals_2.empty:
                 make_histos.plot_1dhist(xvals_1,[x_key,],ranges="none",second_x=True,second_x_data=xvals_2,
                         saveplot=saveplots,pics_dir=output_dir+"hists_1D/",plot_title=x_key + ": "+ first_label + " vs. " + second_label,
-                        first_label=first_label,second_label=second_label)
+                        first_label=first_label,second_label=second_label,plot_title_identifiyer=plot_title_identifiyer)
             
 
 

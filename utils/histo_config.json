@@ -5,6 +5,8 @@
         "theta":[[0,70,100],"Deg."],
         "phitrento":[[0,360,120],"Deg."],
         "t":[[0,7,120],"-$GeV^2$"],
+        "pmom":[[0,4,120],"$GeV$"],
+        "gmom":[[0,6,120],"$GeV$"],
         "xB":[[0,1,120],"None"],
         "Q2":[[0,12,120],"$GeV^2$"],
         "W":[[1,4.5,120],"$GeV$"]
@@ -58,6 +60,39 @@
         "filename":"Photon_Theta_Photon_Phi"       
     }],
 
+    "PthetaGtheta": [{
+        "type":"2D",
+        "data_x":"Ptheta",
+        "data_y":"Gtheta",
+        "type_x":"theta",
+        "type_y":"theta",
+        "label_x":"Proton $\\theta$",
+        "label_y":"Photon1 $\\theta$",
+        "filename":"Proton_Theta_Photon1_Theta"       
+    }],
+
+    "GthetaGtheta2": [{
+        "type":"2D",
+        "data_x":"Gtheta",
+        "data_y":"Gtheta2",
+        "type_x":"theta",
+        "type_y":"theta",
+        "label_x":"Photon1 $\\theta$",
+        "label_y":"Photon2 $\\theta$",
+        "filename":"Photon1_Theta_Photon2s_Theta"       
+    }],
+
+    "PthetaGtheta2": [{
+        "type":"2D",
+        "data_x":"Ptheta",
+        "data_y":"Gtheta2",
+        "type_x":"theta",
+        "type_y":"theta",
+        "label_x":"Proton $\\theta$",
+        "label_y":"Photon2 $\\theta$",
+        "filename":"Proton_Theta_Photon2_Theta"       
+    }],
+
     "PithetaPiphi": [{
         "type":"2D",
         "data_x":"Piphi",
@@ -78,6 +113,61 @@
         "label_x":"Lepton-Hadron Angle $\\phi$",
         "label_y":"Proton $\\theta$",
         "filename":"PhiTrento_PTheta"       
+    }],
+
+    "PpGp": [{
+        "type":"2D",
+        "data_x":"Pp",
+        "data_y":"Gp",
+        "type_x":"pmom",
+        "type_y":"gmom",
+        "label_x":"Proton Momentum",
+        "label_y":"Photon 1 Momentum",
+        "filename":"Proton_Mom_Gamma1_Mom"       
+    }],
+
+    "PpGp2": [{
+        "type":"2D",
+        "data_x":"Pp",
+        "data_y":"Gp2",
+        "type_x":"pmom",
+        "type_y":"gmom",
+        "label_x":"Proton Momentum",
+        "label_y":"Photon 2 Momentum",
+        "filename":"Proton_Mom_Gamma2_Mom"       
+    }],
+    
+    "TrentoPp": [{
+        "type":"2D",
+        "data_x":"phi1",
+        "data_y":"Pp",
+        "type_x":"phitrento",
+        "type_y":"pmom",
+        "label_x":"Lepton-Hadron Angle $\\phi$",
+        "label_y":"Proton Momentum",
+        "filename":"PhiTrento_Proton_Mom"       
+    }],
+
+    "TrentoGp": [{
+        "type":"2D",
+        "data_x":"phi1",
+        "data_y":"Gp",
+        "type_x":"phitrento",
+        "type_y":"gmom",
+        "label_x":"Lepton-Hadron Angle $\\phi$",
+        "label_y":"Photon 1 Momentum",
+        "filename":"PhiTrento_Photon1_Mom"       
+    }],
+
+    "TrentoGp2": [{
+        "type":"2D",
+        "data_x":"phi1",
+        "data_y":"Gp2",
+        "type_x":"phitrento",
+        "type_y":"gmom",
+        "label_x":"Lepton-Hadron Angle $\\phi$",
+        "label_y":"Photon 2 Momentum",
+        "filename":"PhiTrento_Proton2_Mom"       
     }],
 
     "TrentoQ2": [{

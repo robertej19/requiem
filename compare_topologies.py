@@ -6,7 +6,7 @@ import itertools
 import os, sys
 from icecream import ic
 import matplotlib
-#matplotlib.use('Agg') 
+matplotlib.use('Agg') 
 
 
 import matplotlib.pyplot as plt
@@ -227,7 +227,7 @@ plot_reduced_xsec_and_fit = True
 ########################################################################
 ########################################################################
 # Directory definitions
-unique_identifyer = "fd_only"
+unique_identifyer = "with_gp_cut"
 run_identifiyer = mag_config+"_"+generator_type+"_"+unique_identifyer
 
 datafile_base_dir = "/mnt/d/GLOBUS/CLAS12/APS2022/"
@@ -316,10 +316,17 @@ if plot_reduced_xsec_and_fit:
     xmax = 360
     xspace = np.linspace(0, xmax, 1000)
 
-    df_inbending = pd.read_pickle(datafile_base_dir + final_xsec_dir+"full_xsection_inbending_rad_all.pkl")
-    df_outbending = pd.read_pickle(datafile_base_dir + final_xsec_dir+"full_xsection_outbending_rad_all.pkl")
+    # # df_inbending = pd.read_pickle(datafile_base_dir + final_xsec_dir+"full_xsection_inbending_rad_all.pkl")
+    # # df_outbending = pd.read_pickle(datafile_base_dir + final_xsec_dir+"full_xsection_outbending_rad_all.pkl")
 
-                                        
+
+    df_inbending = pd.read_pickle(datafile_base_dir + final_xsec_dir+"full_xsection_inbending_rad_All_All_All_low_and_hi_Gp_cuts.pkl")
+    df_outbending = pd.read_pickle(datafile_base_dir + final_xsec_dir+"full_xsection_outbending_rad_All_All_All_low_and_hi_Gp_cuts.pkl")
+
+    # df_inbending = pd.read_pickle(datafile_base_dir + final_xsec_dir+"full_xsection_inbending_rad_All_All_All_no_Gp_cuts.pkl")
+    # df_outbending = pd.read_pickle(datafile_base_dir + final_xsec_dir+"full_xsection_outbending_rad_All_All_All_no_Gp_cuts.pkl")
+
+
     df_sf_binned = pd.read_pickle('final_data_files/clas6_structure_funcs_binned.pkl')
     df_sf_binned = df_sf_binned.apply(pd.to_numeric)
 

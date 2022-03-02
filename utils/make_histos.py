@@ -74,7 +74,7 @@ def plot_2dhist(x_data,y_data,var_names,ranges,colorbar=True,
         plt.show()
 
 def plot_1dhist(x_data,vars,ranges="none",second_x=False,second_x_data=[],logger=False,first_label="rad",second_label="norad",
-            saveplot=False,pics_dir="none",plot_title="none",first_color="blue",sci_on=False):
+            saveplot=False,pics_dir="none",plot_title="none",first_color="blue",sci_on=False,plot_title_identifiyer=""):
     
     if second_x:
         if len(x_data)<len(second_x_data):
@@ -142,7 +142,7 @@ def plot_1dhist(x_data,vars,ranges="none",second_x=False,second_x_data=[],logger
             if not os.path.exists(pics_dir):
                 os.makedirs(pics_dir)
 
-            plt.savefig(pics_dir + new_plot_title+".png")
+            plt.savefig(pics_dir + plot_title_identifiyer+new_plot_title+".png")
             #plt.savefig(pics_dir + new_plot_title+"_linear_scale"+".png")
 
             plt.close()
