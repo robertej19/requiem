@@ -77,10 +77,11 @@ import json
 
 from convert_root_to_pickle import convert_GEN_NORAD_root_to_pkl
 from convert_root_to_pickle import convert_GEN_RAD_root_to_pkl
-from convert_root_to_pickle import convert_REC_RAD_root_to_pkl
-from convert_root_to_pickle import convert_REC_NORAD_root_to_pkl
-from convert_root_to_pickle import convert_real_to_pkl
-
+#from convert_root_to_pickle import convert_REC_RAD_root_to_pkl
+#from convert_root_to_pickle import convert_REC_NORAD_root_to_pkl
+#from convert_root_to_pickle import convert_real_to_pkl
+from convert_root_to_pickle import new_convert_real_to_pkl
+from convert_root_to_pickle import new_convert_rec_to_pkl
 
 
 from utils import filestruct
@@ -96,7 +97,9 @@ from datetime import datetime
 import json
 
 # For analysis flow
-from make_dvpip_cuts import makeDVpi0
+#from make_dvpip_cuts import makeDVpi0
+from new_dvpip_cuts import makeDVpi0P
+
 from bin_events import bin_df
 
 
@@ -324,7 +327,7 @@ def run_analysis(mag_config,generator_type,unique_identifyer="",
     ########################################################################
     #Choose functions from config parameters
     if generator_type == "rad":
-        rec_converter = convert_REC_RAD_root_to_pkl
+        generator_type_keyword = "pi0rad"
         gen_converter = convert_GEN_RAD_root_to_pkl
         if mag_config == "inbending":
             path_to_exp_root = fs.path_to_exp_inbending_root
@@ -335,7 +338,7 @@ def run_analysis(mag_config,generator_type,unique_identifyer="",
             path_to_rec_root = fs.path_to_rec_outbending_rad_root
             path_to_gen_root = fs.path_to_gen_outbending_rad_root
     elif generator_type == "norad":
-        rec_converter = convert_REC_NORAD_root_to_pkl
+        generator_type_keyword = "pi0norad"
         gen_converter = convert_GEN_NORAD_root_to_pkl
         if mag_config == "inbending":
             path_to_exp_root = fs.path_to_exp_inbending_root
@@ -358,7 +361,7 @@ def run_analysis(mag_config,generator_type,unique_identifyer="",
     #Convert root to pkl
     if convert_roots:
         if convert_root_exp:
-            converter_exp = convert_real_to_pkl.root2pickle(
+            converter_exp = new_convert_real_to_pkl.root2pickle(
                 datafile_base_dir+roots_dir+path_to_exp_root+exp_file_base+".root",
                 pol=mag_config,
                 logistics=False)
@@ -367,9 +370,9 @@ def run_analysis(mag_config,generator_type,unique_identifyer="",
             df_exp.to_pickle(datafile_base_dir+raw_data_dir+exp_file_base+".pkl")
 
         if convert_root_rec:
-            converter_rec = rec_converter.root2pickle(
+            converter_rec = new_convert_rec_to_pkl.root2pickle(
                 datafile_base_dir+roots_dir+path_to_rec_root+rec_file_base+".root",
-                pol=mag_config)
+                pol=mag_config,gen=generator_type_keyword)
 
             df_rec = converter_rec.df
             df_rec.to_pickle(datafile_base_dir+raw_data_dir+rec_file_base+".pkl")
@@ -416,7 +419,7 @@ def run_analysis(mag_config,generator_type,unique_identifyer="",
                         first_label='exp',hists_overlap=False,saveplots=True,output_dir = title_dir)
 
             print("There are {} exp epgg events".format(df_exp_epgg.shape[0]))
-            df_dvpip_exp = makeDVpi0(df_exp_epgg,proton_loc=det_proton_loc,photon1_loc=det_photon1_loc,photon2_loc=det_photon2_loc)
+            df_dvpip_exp = makeDVpi0P(df_exp_epgg,proton_loc=det_proton_loc,photon1_loc=det_photon1_loc,photon2_loc=det_photon2_loc,pol = mag_config)
             df_dvpip_exp.to_pickle("{}/{}_dvpip_exp.pkl".format(datafile_base_dir+dvpip_data_dir,exp_file_base))
             print("There are {} exp dvpip events".format(df_dvpip_exp.shape[0]))
 
@@ -445,7 +448,7 @@ def run_analysis(mag_config,generator_type,unique_identifyer="",
                         first_label='rec',hists_overlap=False,saveplots=True,output_dir = title_dir)
 
             print("There are {} rec epgg events".format(df_rec_epgg.shape[0]))
-            df_dvpip_rec = makeDVpi0(df_rec_epgg,proton_loc=det_proton_loc,photon1_loc=det_photon1_loc,photon2_loc=det_photon2_loc)
+            df_dvpip_rec = makeDVpi0P(df_rec_epgg,proton_loc=det_proton_loc,photon1_loc=det_photon1_loc,photon2_loc=det_photon2_loc,pol = mag_config)
             df_dvpip_rec.to_pickle("{}/{}_dvpip_rec.pkl".format(datafile_base_dir+dvpip_data_dir,rec_file_base))
 
             print("There are {} rec dvpip events".format(df_dvpip_rec.shape[0]))
@@ -511,6 +514,10 @@ def run_analysis(mag_config,generator_type,unique_identifyer="",
 
         df_dvpip_exp = pd.read_pickle("{}/{}_dvpip_exp.pkl".format(datafile_base_dir+dvpip_data_dir,exp_file_base))
         df_dvpip_rec = pd.read_pickle("{}/{}_dvpip_rec.pkl".format(datafile_base_dir+dvpip_data_dir,rec_file_base))
+
+        #df_dvpip_exp = pd.read_pickle("new_exp_dvpi0p_outbend.pkl")
+        #df_dvpip_rec = pd.read_pickle("new_rec_dvpi0p_outbend_rad.pkl")
+
 
         df_exp_binned = bin_df(df_dvpip_exp, "exp")
         df_rec_binned = bin_df(df_dvpip_rec, "rec")
@@ -849,14 +856,14 @@ for mc in mag_configs:
     for pl in proton_locs:
         for p1l in photon1_locs:
             for p2l in photon2_locs:
-                run_analysis(mc,generator_type,unique_identifyer="proton_notin_35_45",
+                run_analysis(mc,generator_type,unique_identifyer="new_cuts_and_smearing",
                             det_proton_loc=pl,det_photon1_loc=p1l,det_photon2_loc=p2l,
-                            convert_roots = 0,
+                            convert_roots = 1,
                             make_exclusive_cuts = 1,
                             plot_initial_distros = 0,
                             plot_final_distros = 1,
                             bin_all_events = 1,
-                            bin_gen = 0,
+                            bin_gen = 1,
                             calc_xsection = 1,
                             plot_reduced_xsec_and_fit = 1,
                             plot_1_D_hists = 1)
