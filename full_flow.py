@@ -240,7 +240,9 @@ def run_analysis(mag_config,generator_type,unique_identifyer="",
                 bin_gen = 0,
                 calc_xsection = 0,
                 plot_reduced_xsec_and_fit = 0,
-                plot_1_D_hists = 1):
+                plot_1_D_hists = 1,
+                emergency_stop = 0,
+                qxt_cuts = [[0,100],[0,1],[0,100]]):
 
 
     run_identifiyer = mag_config+"_"+generator_type+"_"+det_proton_loc+"_"+det_photon1_loc+"_"+det_photon2_loc+"_"+unique_identifyer
@@ -402,6 +404,10 @@ def run_analysis(mag_config,generator_type,unique_identifyer="",
 
             df_exp_epgg = df_exp
 
+            df_exp_epgg = df_exp_epgg.query("Q2 > {} and Q2 < {} and xB > {} and xB < {} and t1 > {} and t1 < {}".format(qxt_cuts[0][0],qxt_cuts[0][1],qxt_cuts[1][0],qxt_cuts[1][1],qxt_cuts[2][0],qxt_cuts[2][1]))
+
+            df_exp_epgg.to_pickle(datafile_base_dir+raw_data_dir+exp_file_base+"_ex_cut"+".pkl")
+
             df_exp_epgg.loc[:,'y'] = df_exp_epgg['nu']/10.604
             
             if plot_initial_exp_distros:
@@ -428,6 +434,8 @@ def run_analysis(mag_config,generator_type,unique_identifyer="",
                 df_rec = pd.read_pickle(datafile_base_dir+raw_data_dir+rec_file_base+".pkl")
 
             df_rec_epgg = df_rec
+            df_rec_epgg = df_rec_epgg.query("Q2 > {} and Q2 < {} and xB > {} and xB < {} and t1 > {} and t1 < {}".format(qxt_cuts[0][0],qxt_cuts[0][1],qxt_cuts[1][0],qxt_cuts[1][1],qxt_cuts[2][0],qxt_cuts[2][1]))
+
             df_rec_epgg.loc[:,'y'] = df_rec_epgg['nu']/10.604
 
             
@@ -484,6 +492,9 @@ def run_analysis(mag_config,generator_type,unique_identifyer="",
                 histo_plotting.make_all_histos(df_dvpip_gen,datatype="Gen",hists_2d=True,hists_1d=plot_1_D_hists,
                         first_label='gen',hists_overlap=False,saveplots=True,output_dir = title_dir)
 
+    if emergency_stop:
+        print("Emergency stop, exiting function")
+        return
 
     #### BIN EVENTS
     if bin_all_events:
@@ -811,23 +822,24 @@ def run_analysis(mag_config,generator_type,unique_identifyer="",
 
 
 # Directory definitions
-unique_identifyer = ""
-det_proton_loc="CD"
-det_photon1_loc="All"
-det_photon2_loc="All"
+# # unique_identifyer = ""
+# # det_proton_loc="CD"
+# # det_photon1_loc="All"
+# # det_photon2_loc="All"
 
-#Analysis topology defintion
-#generator_type = "norad"
-#mag_config = "inbending"
-#mag_config = "outbending"
+# # #Analysis topology defintion
+# # #generator_type = "norad"
+# # #mag_config = "inbending"
+# # #mag_config = "outbending"
 
-# mag_configs = ["inbending","outbending"]
-# generator_type = "rad"
-# proton_locs = ["CD","FD"]
-# photon1_locs = ["FD","FT","All"]
-# photon2_locs = ["FD","FT","All"]
+# # # mag_configs = ["inbending","outbending"]
+# # # generator_type = "rad"
+# # # proton_locs = ["CD","FD"]
+# # # photon1_locs = ["FD","FT","All"]
+# # # photon2_locs = ["FD","FT","All"]
 
-mag_configs = ["inbending","outbending"]
+#mag_configs = ["inbending","outbending"]
+mag_configs = ["outbending",]#"outbending"]
 generator_type = "rad"
 proton_locs = ["All",]
 photon1_locs = ["All",]
@@ -837,7 +849,7 @@ for mc in mag_configs:
     for pl in proton_locs:
         for p1l in photon1_locs:
             for p2l in photon2_locs:
-                run_analysis(mc,generator_type,unique_identifyer="no_Gp_cuts",
+                run_analysis(mc,generator_type,unique_identifyer="proton_notin_35_45",
                             det_proton_loc=pl,det_photon1_loc=p1l,det_photon2_loc=p2l,
                             convert_roots = 0,
                             make_exclusive_cuts = 1,
@@ -847,4 +859,41 @@ for mc in mag_configs:
                             bin_gen = 0,
                             calc_xsection = 1,
                             plot_reduced_xsec_and_fit = 1,
-                            plot_1_D_hists = 0)
+                            plot_1_D_hists = 1)
+
+
+sys.exit()
+
+q2_ranges = [[1.5,2.0],[2.0,2.5],[4.0,4.5]]
+xB_ranges = [[0.3,0.35],[0.3,0.35],[0.5,0.55]]
+t_ranges = [[0.4,0.6],[0.4,0.6],[0.6,1]]
+
+for q,x,t in zip(q2_ranges,xB_ranges,t_ranges):
+    unique_identifyer = "q2exam_{}_{}_{}".format(round((q[0]+q[1])/2,2),round((x[0]+x[1])/2,2),round((t[0]+t[1])/2,2))
+    q_min = q[0]
+    q_max = q[1]
+    x_min = x[0]
+    x_max = x[1]
+    t_min = t[0]
+    t_max = t[1]
+
+    mag_configs = ["inbending","outbending"]
+    generator_type = "rad"
+    pl = "All"
+    p1l = "All"
+    p2l = "All"
+    for mc in mag_configs:
+        run_analysis(mc,generator_type,unique_identifyer=unique_identifyer,
+                                    det_proton_loc=pl,det_photon1_loc=p1l,det_photon2_loc=p2l,
+                                    convert_roots = 0,
+                                    make_exclusive_cuts = 1,
+                                    plot_initial_distros = 0,
+                                    plot_final_distros = 1,
+                                    bin_all_events = 1,
+                                    bin_gen = 0,
+                                    calc_xsection = 1,
+                                    plot_reduced_xsec_and_fit = 1,
+                                    plot_1_D_hists = 0,
+                                    emergency_stop = 1,
+                                    qxt_cuts = [q,x,t])
+

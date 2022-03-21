@@ -448,31 +448,36 @@ class root2pickle():
         if detRes:
             df_protonRec.loc[:, "PAngleDiff"] = df_protonRec.loc[:, "PDc3theta"] - df_protonRec.loc[:, "PDc1theta"]
 
-        #smearing photon
-        gam = [df_gammaRec['Gpx'], df_gammaRec['Gpy'], df_gammaRec['Gpz']]
-        df_gammaRec.loc[:, 'Gp'] = mag(gam)
-        df_gammaRec.loc[:, 'Gtheta'] = getTheta(gam)
-        df_gammaRec.loc[:, 'Gphi'] = getPhi(gam)
-        #FT photon
-        df_gammaRec.loc[df_gammaRec["Gsector"]>7, "Gp"] = df_gammaRec.loc[df_gammaRec["Gsector"]>7, "Gp"]*np.random.normal(1, 0.014, len(df_gammaRec.loc[df_gammaRec.Gsector>7]))
-        #FD photon
-        df_gammaRec.loc[df_gammaRec["Gsector"]<7, "Gp"] = df_gammaRec.loc[df_gammaRec["Gsector"]<7, "Gp"]*np.random.normal(1, 0.035, len(df_gammaRec.loc[df_gammaRec.Gsector<7]))
+        # Turn off smearing, for now
+        # # # #smearing photon
+        # # # gam = [df_gammaRec['Gpx'], df_gammaRec['Gpy'], df_gammaRec['Gpz']]
+        # # # df_gammaRec.loc[:, 'Gp'] = mag(gam)
+        # # # df_gammaRec.loc[:, 'Gtheta'] = getTheta(gam)
+        # # # df_gammaRec.loc[:, 'Gphi'] = getPhi(gam)
+        # # # #FT photon
+        # # # df_gammaRec.loc[df_gammaRec["Gsector"]>7, "Gp"] = df_gammaRec.loc[df_gammaRec["Gsector"]>7, "Gp"]*np.random.normal(1, 0.014, len(df_gammaRec.loc[df_gammaRec.Gsector>7]))
+        # # # #FD photon
+        # # # df_gammaRec.loc[df_gammaRec["Gsector"]<7, "Gp"] = df_gammaRec.loc[df_gammaRec["Gsector"]<7, "Gp"]*np.random.normal(1, 0.035, len(df_gammaRec.loc[df_gammaRec.Gsector<7]))
 
-        df_gammaRec.loc[:, "Gpx"] = df_gammaRec.loc[:, "Gp"]*np.sin(np.radians(df_gammaRec.loc[:, "Gtheta"]))*np.cos(np.radians(df_gammaRec.loc[:, "Gphi"]))
-        df_gammaRec.loc[:, "Gpy"] = df_gammaRec.loc[:, "Gp"]*np.sin(np.radians(df_gammaRec.loc[:, "Gtheta"]))*np.sin(np.radians(df_gammaRec.loc[:, "Gphi"]))
-        df_gammaRec.loc[:, "Gpz"] = df_gammaRec.loc[:, "Gp"]*np.cos(np.radians(df_gammaRec.loc[:, "Gtheta"]))
+        # # # df_gammaRec.loc[:, "Gpx"] = df_gammaRec.loc[:, "Gp"]*np.sin(np.radians(df_gammaRec.loc[:, "Gtheta"]))*np.cos(np.radians(df_gammaRec.loc[:, "Gphi"]))
+        # # # df_gammaRec.loc[:, "Gpy"] = df_gammaRec.loc[:, "Gp"]*np.sin(np.radians(df_gammaRec.loc[:, "Gtheta"]))*np.sin(np.radians(df_gammaRec.loc[:, "Gphi"]))
+        # # # df_gammaRec.loc[:, "Gpz"] = df_gammaRec.loc[:, "Gp"]*np.cos(np.radians(df_gammaRec.loc[:, "Gtheta"]))
 
-        #smearing proton
-        #CD proton
-        df_protonRec.loc[df_protonRec["Psector"]>7, "Pp"] = df_protonRec.loc[df_protonRec["Psector"]>7, "Pp"]*np.random.normal(1, np.abs(0.16*(1/(1+np.exp(-(df_protonRec.loc[df_protonRec["Psector"]>7, "Pp"]-0.3)/0.1))-0.5)), len(df_protonRec.loc[df_protonRec.Psector>7]))
-        df_protonRec.loc[df_protonRec["Psector"]>7, "Ptheta"] = df_protonRec.loc[df_protonRec["Psector"]>7, "Ptheta"] + np.random.normal(0, 0.8, len(df_protonRec.loc[df_protonRec.Psector>7]))
-        df_protonRec.loc[df_protonRec["Psector"]>7, "Pphi"] = df_protonRec.loc[df_protonRec["Psector"]>7, "Pphi"] + np.random.normal(0, 2.2, len(df_protonRec.loc[df_protonRec.Psector>7])) 
-        #FD proton
-        if pol == "inbending":
-            # df_protonRec.loc[df_protonRec["Psector"]<7, "Pp"] = df_protonRec.loc[df_protonRec["Psector"]<7, "Pp"]*np.random.normal(1, np.select([df_protonRec.loc[df_protonRec["Psector"]<7, "Pp"]<1.3, (df_protonRec.loc[df_protonRec["Psector"]<7, "Pp"]>=1.3) & (df_protonRec.loc[df_protonRec["Psector"]<7, "Pp"]<1.9), df_protonRec.loc[df_protonRec["Psector"]<7, "Pp"]>=1.9], [0.075, -7/120*df_protonRec.loc[df_protonRec["Psector"]<7, "Pp"]+7*1.9/120+0.04, 0.04])*(1/(1+np.exp(-(df_protonRec.loc[df_protonRec["Psector"]<7, "Pp"]-0.5)/0.05))), len(df_protonRec.loc[df_protonRec.Psector<7]))
-            df_protonRec.loc[df_protonRec["Psector"]<7, "Pp"] = df_protonRec.loc[df_protonRec["Psector"]<7, "Pp"]*np.random.normal(1, np.select([df_protonRec.loc[df_protonRec["Psector"]<7, "Pp"]<1.3, (df_protonRec.loc[df_protonRec["Psector"]<7, "Pp"]>=1.3) & (df_protonRec.loc[df_protonRec["Psector"]<7, "Pp"]<1.9), df_protonRec.loc[df_protonRec["Psector"]<7, "Pp"]>=1.9], [0.06, -(0.06-0.04)/(1.9-1.3)*df_protonRec.loc[df_protonRec["Psector"]<7, "Pp"]+(0.06-0.04)/(1.9-1.3)*1.9+0.04, 0.04])*(1/(1+np.exp(-(df_protonRec.loc[df_protonRec["Psector"]<7, "Pp"]-0.5)/0.05))), len(df_protonRec.loc[df_protonRec.Psector<7]))
-        elif pol == "outbending":
-            df_protonRec.loc[df_protonRec["Psector"]<7, "Pp"] = df_protonRec.loc[df_protonRec["Psector"]<7, "Pp"]*np.random.normal(1, np.select([df_protonRec.loc[df_protonRec["Psector"]<7, "Pp"]<.95, (df_protonRec.loc[df_protonRec["Psector"]<7, "Pp"]>=.95) & (df_protonRec.loc[df_protonRec["Psector"]<7, "Pp"]<1.2), (df_protonRec.loc[df_protonRec["Psector"]<7, "Pp"]>=1.2)&(df_protonRec.loc[df_protonRec["Psector"]<7, "Pp"]<1.575), (df_protonRec.loc[df_protonRec["Psector"]<7, "Pp"]>=1.575) & (df_protonRec.loc[df_protonRec["Psector"]<7, "Pp"]<1.9), (df_protonRec.loc[df_protonRec["Psector"]<7, "Pp"]>1.9)], [0.08, -0.025/(1.2-.95)*df_protonRec.loc[df_protonRec["Psector"]<7, "Pp"]+1.2*0.025/(1.2-.95) + 0.055, 0.055, -0.015/(1.9-1.575)*df_protonRec.loc[df_protonRec["Psector"]<7, "Pp"]+1.9*0.015/(1.9-1.575) + 0.04,0.04])*(1/(1+np.exp(-(df_protonRec.loc[df_protonRec["Psector"]<7, "Pp"]-0.6)/0.05))), len(df_protonRec.loc[df_protonRec.Psector<7]))
+        # # # #smearing proton
+        # # # #CD proton
+        # # # df_protonRec.loc[df_protonRec["Psector"]>7, "Pp"] = df_protonRec.loc[df_protonRec["Psector"]>7, "Pp"]*np.random.normal(1, np.abs(0.16*(1/(1+np.exp(-(df_protonRec.loc[df_protonRec["Psector"]>7, "Pp"]-0.3)/0.1))-0.5)), len(df_protonRec.loc[df_protonRec.Psector>7]))
+        # # # df_protonRec.loc[df_protonRec["Psector"]>7, "Ptheta"] = df_protonRec.loc[df_protonRec["Psector"]>7, "Ptheta"] + np.random.normal(0, 0.8, len(df_protonRec.loc[df_protonRec.Psector>7]))
+        # # # df_protonRec.loc[df_protonRec["Psector"]>7, "Pphi"] = df_protonRec.loc[df_protonRec["Psector"]>7, "Pphi"] + np.random.normal(0, 2.2, len(df_protonRec.loc[df_protonRec.Psector>7])) 
+        # # # #FD proton
+        # # # if pol == "inbending":
+        # # #     # df_protonRec.loc[df_protonRec["Psector"]<7, "Pp"] = df_protonRec.loc[df_protonRec["Psector"]<7, "Pp"]*np.random.normal(1, np.select([df_protonRec.loc[df_protonRec["Psector"]<7, "Pp"]<1.3, (df_protonRec.loc[df_protonRec["Psector"]<7, "Pp"]>=1.3) & (df_protonRec.loc[df_protonRec["Psector"]<7, "Pp"]<1.9), df_protonRec.loc[df_protonRec["Psector"]<7, "Pp"]>=1.9], [0.075, -7/120*df_protonRec.loc[df_protonRec["Psector"]<7, "Pp"]+7*1.9/120+0.04, 0.04])*(1/(1+np.exp(-(df_protonRec.loc[df_protonRec["Psector"]<7, "Pp"]-0.5)/0.05))), len(df_protonRec.loc[df_protonRec.Psector<7]))
+        # # #     df_protonRec.loc[df_protonRec["Psector"]<7, "Pp"] = df_protonRec.loc[df_protonRec["Psector"]<7, "Pp"]*np.random.normal(1, np.select([df_protonRec.loc[df_protonRec["Psector"]<7, "Pp"]<1.3, (df_protonRec.loc[df_protonRec["Psector"]<7, "Pp"]>=1.3) & (df_protonRec.loc[df_protonRec["Psector"]<7, "Pp"]<1.9), df_protonRec.loc[df_protonRec["Psector"]<7, "Pp"]>=1.9], [0.06, -(0.06-0.04)/(1.9-1.3)*df_protonRec.loc[df_protonRec["Psector"]<7, "Pp"]+(0.06-0.04)/(1.9-1.3)*1.9+0.04, 0.04])*(1/(1+np.exp(-(df_protonRec.loc[df_protonRec["Psector"]<7, "Pp"]-0.5)/0.05))), len(df_protonRec.loc[df_protonRec.Psector<7]))
+        # # # elif pol == "outbending":
+        # # #     df_protonRec.loc[df_protonRec["Psector"]<7, "Pp"] = df_protonRec.loc[df_protonRec["Psector"]<7, "Pp"]*np.random.normal(1, np.select([df_protonRec.loc[df_protonRec["Psector"]<7, "Pp"]<.95, (df_protonRec.loc[df_protonRec["Psector"]<7, "Pp"]>=.95) & (df_protonRec.loc[df_protonRec["Psector"]<7, "Pp"]<1.2), (df_protonRec.loc[df_protonRec["Psector"]<7, "Pp"]>=1.2)&(df_protonRec.loc[df_protonRec["Psector"]<7, "Pp"]<1.575), (df_protonRec.loc[df_protonRec["Psector"]<7, "Pp"]>=1.575) & (df_protonRec.loc[df_protonRec["Psector"]<7, "Pp"]<1.9), (df_protonRec.loc[df_protonRec["Psector"]<7, "Pp"]>1.9)], [0.08, -0.025/(1.2-.95)*df_protonRec.loc[df_protonRec["Psector"]<7, "Pp"]+1.2*0.025/(1.2-.95) + 0.055, 0.055, -0.015/(1.9-1.575)*df_protonRec.loc[df_protonRec["Psector"]<7, "Pp"]+1.9*0.015/(1.9-1.575) + 0.04,0.04])*(1/(1+np.exp(-(df_protonRec.loc[df_protonRec["Psector"]<7, "Pp"]-0.6)/0.05))), len(df_protonRec.loc[df_protonRec.Psector<7]))
+
+
+
+
 
         #moduli proton phi
         df_protonRec.loc[:, "Pphi"] = np.where(df_protonRec.loc[:, "Pphi"]>180, df_protonRec.loc[:, "Pphi"] - 360, df_protonRec.loc[:, "Pphi"]) 

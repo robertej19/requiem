@@ -5,8 +5,8 @@
         "theta":[[0,70,100],"Deg."],
         "phitrento":[[0,360,120],"Deg."],
         "t":[[0,7,120],"-$GeV^2$"],
-        "pmom":[[0,4,120],"$GeV$"],
-        "gmom":[[0,6,120],"$GeV$"],
+        "pmom":[[0,2,120],"$GeV$"],
+        "gmom":[[0,4,120],"$GeV$"],
         "xB":[[0,1,120],"None"],
         "Q2":[[0,12,120],"$GeV^2$"],
         "W":[[1,4.5,120],"$GeV$"]
@@ -115,6 +115,94 @@
         "filename":"PhiTrento_PTheta"       
     }],
 
+    "Q2Ptheta": [{
+        "type":"2D",
+        "data_x":"Q2",
+        "data_y":"Ptheta",
+        "type_x":"Q2",
+        "type_y":"theta",
+        "label_x":"$Q^2$",
+        "label_y":"Proton $\\theta$",
+        "filename":"Q2PTheta"       
+    }],
+
+    "Q2Pphi": [{
+        "type":"2D",
+        "data_x":"Q2",
+        "data_y":"Pphi",
+        "type_x":"Q2",
+        "type_y":"phi",
+        "label_x":"$Q^2$",
+        "label_y":"Proton $\\phi$",
+        "filename":"Q2Pphi"       
+    }],
+
+    "Q2Etheta": [{
+        "type":"2D",
+        "data_x":"Q2",
+        "data_y":"Etheta",
+        "type_x":"Q2",
+        "type_y":"theta",
+        "label_x":"$Q^2$",
+        "label_y":"Electron $\\theta$",
+        "filename":"Q2Etheta"       
+    }],
+
+    "Q2Ephi": [{
+        "type":"2D",
+        "data_x":"Q2",
+        "data_y":"Ephi",
+        "type_x":"Q2",
+        "type_y":"phi",
+        "label_x":"$Q^2$",
+        "label_y":"Electron $\\phi$",
+        "filename":"Q2Ephi"       
+    }],
+
+    "Q2Gtheta": [{
+        "type":"2D",
+        "data_x":"Q2",
+        "data_y":"Gtheta",
+        "type_x":"Q2",
+        "type_y":"theta",
+        "label_x":"$Q^2$",
+        "label_y":"Photon $\\theta$",
+        "filename":"Q2GTheta"       
+    }],
+
+    "Q2Gphi": [{
+        "type":"2D",
+        "data_x":"Q2",
+        "data_y":"Gphi",
+        "type_x":"Q2",
+        "type_y":"phi",
+        "label_x":"$Q^2$",
+        "label_y":"Photon $\\phi$",
+        "filename":"Q2Gphi"       
+    }],
+
+    "Q2Gtheta2": [{
+        "type":"2D",
+        "data_x":"Q2",
+        "data_y":"Gtheta2",
+        "type_x":"Q2",
+        "type_y":"theta",
+        "label_x":"$Q^2$",
+        "label_y":"Photon2 $\\theta$",
+        "filename":"Q2GTheta2"       
+    }],
+
+    "Q2Gphi2": [{
+        "type":"2D",
+        "data_x":"Q2",
+        "data_y":"Gphi2",
+        "type_x":"Q2",
+        "type_y":"phi",
+        "label_x":"$Q^2$",
+        "label_y":"Photon2 $\\phi$",
+        "filename":"Q2Gphi2"       
+    }],
+
     "PpGp": [{
         "type":"2D",
         "data_x":"Pp",
@@ -214,6 +302,9 @@
         "label_y":"$Q^2$",
         "filename":"W_Q2"       
     }],
+
+
+
 
     "xbQ2": [{
         "type":"2D",

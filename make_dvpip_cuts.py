@@ -45,6 +45,19 @@ def makeDVpi0(df_epgg,proton_loc="All",photon1_loc="All",photon2_loc="All"):
         cut_Q2 = (df_epgg.loc[:, "Q2"] > 1)# & (df_epgg.loc[:, "Q2"] <1.5)  # Q2
         cut_W = df_epgg.loc[:, "W"] > 2  # W
 
+        cut_Ptheta_low = df_epgg.loc[:, "Ptheta"] > 0  # W
+        cut_Ptheta_hi = df_epgg.loc[:, "Ptheta"] < 65  # W
+        cut_Ptheta_mid = df_epgg.loc[:, "Ptheta"] < 35  # W
+        cut_Ptheta_mid2 = df_epgg.loc[:, "Ptheta"] >45  # W
+
+        cut_Pphi_low = df_epgg.loc[:, "Pphi"] > -360  # W
+        cut_Pphi_hi = df_epgg.loc[:, "Pphi"] < 360  # W
+
+
+        cut_Ptheta_low_mid_hi = (cut_Ptheta_low & cut_Ptheta_mid)|(cut_Ptheta_mid2 & cut_Ptheta_hi)
+
+
+
         cut_Gpz2_low = df_epgg.loc[:, "Gpz2"] > 0#0.4  # Gpz2
         cut_Gpz_hi = df_epgg.loc[:, "Gpz"] < 6000  # Gpz2
 
@@ -93,6 +106,9 @@ def makeDVpi0(df_epgg,proton_loc="All",photon1_loc="All",photon2_loc="All"):
                 cut_photon2 = True
 
         df_dvpi0 = df_epgg.loc[cut_xBupper & cut_xBlower & cut_Q2 & cut_W & 
+                                cut_Ptheta_low_mid_hi &
+                                cut_Pphi_low &
+                                cut_Pphi_hi &
                                 cut_pi0upper & 
                                 cut_pi0lower & 
                                 cut_mmep_hi & 

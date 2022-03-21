@@ -550,7 +550,7 @@ if plot_reduced_xsec_and_fit:
                     ax.legend(loc="best")
                     ax.set_xlabel("Phi")  
                     ax.set_ylabel('Reduced Cross Section (nb/GeV$^2$)')  
-                    title = "Cross Section Fit Over Phi, Q$^2$ = {:.2f}, x$_B$ = {:.2f}, t = {:.1f}".format(df_sf_binned_small['q'].values[0],df_sf_binned_small['x'].values[0],df_sf_binned_small['t'].values[0])
+                    title = "Reduced Cross Section Fit Over Phi, Q$^2$ = {:.2f}, x$_B$ = {:.2f}, t = {:.1f}".format(df_sf_binned_small['q'].values[0],df_sf_binned_small['x'].values[0],df_sf_binned_small['t'].values[0])
                     plt.title(title)
 
 
