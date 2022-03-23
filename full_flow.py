@@ -245,7 +245,8 @@ def run_analysis(mag_config,generator_type,unique_identifyer="",
                 plot_reduced_xsec_and_fit = 0,
                 plot_1_D_hists = 1,
                 emergency_stop = 0,
-                qxt_cuts = [[0,100],[0,1],[0,100]]):
+                qxt_cuts = [[0,100],[0,1],[0,100]],
+                simple_exclusivity_cuts=False):
 
 
     run_identifiyer = mag_config+"_"+generator_type+"_"+det_proton_loc+"_"+det_photon1_loc+"_"+det_photon2_loc+"_"+unique_identifyer
@@ -419,9 +420,12 @@ def run_analysis(mag_config,generator_type,unique_identifyer="",
                         first_label='exp',hists_overlap=False,saveplots=True,output_dir = title_dir)
 
             print("There are {} exp epgg events".format(df_exp_epgg.shape[0]))
-            df_dvpip_exp = makeDVpi0P(df_exp_epgg,proton_loc=det_proton_loc,photon1_loc=det_photon1_loc,photon2_loc=det_photon2_loc,pol = mag_config)
+            df_dvpip_exp = makeDVpi0P(df_exp_epgg,proton_loc=det_proton_loc,photon1_loc=det_photon1_loc,photon2_loc=det_photon2_loc,pol = mag_config,simple_exclusivity_cuts=simple_exclusivity_cuts)
+            #df_dvpip_exp = pd.read_pickle("{}/{}_dvpip_exp.pkl".format(datafile_base_dir+dvpip_data_dir,exp_file_base))
             df_dvpip_exp.to_pickle("{}/{}_dvpip_exp.pkl".format(datafile_base_dir+dvpip_data_dir,exp_file_base))
             print("There are {} exp dvpip events".format(df_dvpip_exp.shape[0]))
+
+            df_dvpip_exp = df_dvpip_exp.query("Q2 > {} and Q2 < {} and xB > {} and xB < {} and t1 > {} and t1 < {}".format(qxt_cuts[0][0],qxt_cuts[0][1],qxt_cuts[1][0],qxt_cuts[1][1],qxt_cuts[2][0],qxt_cuts[2][1]))
 
             if plot_final_exp_distros:
                 title_dir = datafile_base_dir+final_distros_dir+final_exp_plots_dir
@@ -448,7 +452,8 @@ def run_analysis(mag_config,generator_type,unique_identifyer="",
                         first_label='rec',hists_overlap=False,saveplots=True,output_dir = title_dir)
 
             print("There are {} rec epgg events".format(df_rec_epgg.shape[0]))
-            df_dvpip_rec = makeDVpi0P(df_rec_epgg,proton_loc=det_proton_loc,photon1_loc=det_photon1_loc,photon2_loc=det_photon2_loc,pol = mag_config)
+            df_dvpip_rec = makeDVpi0P(df_rec_epgg,proton_loc=det_proton_loc,photon1_loc=det_photon1_loc,photon2_loc=det_photon2_loc,pol = mag_config,simple_exclusivity_cuts=simple_exclusivity_cuts)
+            #df_dvpip_rec = pd.read_pickle("{}/{}_dvpip_rec.pkl".format(datafile_base_dir+dvpip_data_dir,rec_file_base))
             df_dvpip_rec.to_pickle("{}/{}_dvpip_rec.pkl".format(datafile_base_dir+dvpip_data_dir,rec_file_base))
 
             print("There are {} rec dvpip events".format(df_dvpip_rec.shape[0]))
@@ -662,6 +667,12 @@ def run_analysis(mag_config,generator_type,unique_identifyer="",
         df_sf_binned = pd.read_pickle('final_data_files/clas6_structure_funcs_binned.pkl')
         df_sf_binned = df_sf_binned.apply(pd.to_numeric)
 
+        #for col in df.columns:
+        #    print(col)
+        #print(df_sf_binned.head(3))
+        #sys.exit()
+
+
 
         df.loc[:,"xsec_corr_nb_gamma"] = df["xsec_corr"]*1E33/df["gamma_exp"]
 
@@ -707,6 +718,7 @@ def run_analysis(mag_config,generator_type,unique_identifyer="",
                         epsi_mean_c12 = df_small["epsi_exp"].mean()
                         mean_xsec_uncer_ratio_c12 = df_small['c_12_uncert_ratio'].mean()
 
+                       
 
                         binscenters_c12 = df_small["pave_exp"]
                         data_entries_c12 = df_small["xsec_corr_nb_gamma"]
@@ -806,8 +818,11 @@ def run_analysis(mag_config,generator_type,unique_identifyer="",
 
                         plt.rcParams["font.size"] = "20"
 
-                        fit2, = ax.plot(xspace, fit_y_data_weighted, color='red', linewidth=2.5, label='CLAS6 Fit:         t+l:{:.0f} tt:{:.0f} lt:{:.0f}'.format(pub_tel,pub_tt,pub_lt))
-                        fit4, = ax.plot(xspace, fit_y_data_weighted_new_c12, color='blue', linewidth=2.5, label='CLAS12 Fit: t+l:{:.0f} tt:{:.0f} lt:{:.0f}'.format(tel_c12,tt_c12,lt_c12))
+                        #fit2, = ax.plot(xspace, fit_y_data_weighted, color='red', linewidth=2.5, label='CLAS6 Fit:         t+l:{:.0f} tt:{:.0f} lt:{:.0f}'.format(pub_tel,pub_tt,pub_lt))
+                        fit2, = ax.plot(xspace, fit_y_data_weighted, color='red', linewidth=2.5, label='CLAS6 Bin:         Q2: {:.2f} xB: {:.2f} t: {:.2f}'.format(df_sf_binned_small['q'].values[0],df_sf_binned_small['x'].values[0],df_sf_binned_small['t'].values[0]))
+                        
+                        #fit4, = ax.plot(xspace, fit_y_data_weighted_new_c12, color='blue', linewidth=2.5, label='CLAS12 Fit: t+l:{:.0f} tt:{:.0f} lt:{:.0f}'.format(tel_c12,tt_c12,lt_c12))
+                        fit4, = ax.plot(xspace, fit_y_data_weighted_new_c12, color='blue', linewidth=2.5, label='CLAS12 Bin:      Q2: {:.2f} xB: {:.2f} t: {:.2f}'.format(df_small["qave_exp"].mean(),df_small["xave_exp"].mean(),df_small["tave_exp"].mean()))
                         
                         ax.legend(loc="best")
                         ax.set_xlabel("Phi")  
@@ -856,7 +871,7 @@ for mc in mag_configs:
     for pl in proton_locs:
         for p1l in photon1_locs:
             for p2l in photon2_locs:
-                run_analysis(mc,generator_type,unique_identifyer="new_cuts_and_smearing",
+                run_analysis(mc,generator_type,unique_identifyer="compare_c12_c6_bin_averages_simple_cuts",
                             det_proton_loc=pl,det_photon1_loc=p1l,det_photon2_loc=p2l,
                             convert_roots = 1,
                             make_exclusive_cuts = 1,
@@ -866,7 +881,8 @@ for mc in mag_configs:
                             bin_gen = 1,
                             calc_xsection = 1,
                             plot_reduced_xsec_and_fit = 1,
-                            plot_1_D_hists = 1)
+                            plot_1_D_hists = 1,
+                            simple_exclusivity_cuts=False)
 
 
 sys.exit()
@@ -884,7 +900,8 @@ for q,x,t in zip(q2_ranges,xB_ranges,t_ranges):
     t_min = t[0]
     t_max = t[1]
 
-    mag_configs = ["inbending","outbending"]
+    #mag_configs = ["inbending","outbending"]
+    mag_configs = ["outbending"]
     generator_type = "rad"
     pl = "All"
     p1l = "All"

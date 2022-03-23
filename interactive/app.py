@@ -73,12 +73,23 @@ lifts_labels = joblib.load("dataArrays/hist_lables.pkl")
 #df_minibin = joblib.load("dataArrays/full_xsection.pkl")
 #df_minibin = joblib.load("dataArrays/full_xsection_noseccut.pkl")
 #df_minibin = joblib.load("dataArrays/full_xsection_Sangbaek_rad_CD_sim.pkl")
-df_minibin = joblib.load("dataArrays/full_xsection_noseccut_bkmrg.pkl")
+#df_minibin = joblib.load("dataArrays/full_xsection_noseccut_bkmrg.pkl")
+df_minibin = joblib.load("dataArrays/full_xsection_outbending_rad_All_All_All_compare_c12_c6_bin_averages.pkl")
 #df_minibin = joblib.load("dataArrays/full_xsection_CD_Included.pkl")
 
 #df['xsec_corr_red_nb'] = df_minibin['counts_rec']
 
 df_minibin['xsec_corr_red_nb'] = np.where((df_minibin.counts_rec < 3),np.nan,df_minibin.xsec_corr_red_nb)
+df_minibin.loc[:,"xsec_ratio_exp_corr"] = df_minibin.xsec_corr_red_nb/df_minibin.counts_rec
+df_minibin.loc[:,"uncert_xsec_ratio_exp_corr"] = df_minibin.xsec_corr_red_nb/df_minibin.counts_rec
+df_minibin.loc[:,"counts_10600GeV"] = df_minibin.xsec_corr_red_nb/df_minibin.counts_rec
+df_minibin.loc[:,"uncert_counts_10600GeV"] = df_minibin.xsec_corr_red_nb/df_minibin.counts_rec
+df_minibin.loc[:,"uncert_counts_5776GeV"] = df_minibin.xsec_corr_red_nb/df_minibin.counts_rec
+
+df_minibin.loc[:,"counts_5776GeV"] = df_minibin.xsec_corr_red_nb/df_minibin.counts_rec
+df_minibin.loc[:,"xsec_ratio_sim"] = df_minibin.xsec_corr_red_nb/df_minibin.counts_rec
+
+
 
 fs = filestruct.fs()
 

@@ -93,6 +93,50 @@
         "filename":"Proton_Theta_Photon2_Theta"       
     }],
 
+    "EthetaGtheta2": [{
+        "type":"2D",
+        "data_x":"Etheta",
+        "data_y":"Gtheta2",
+        "type_x":"theta",
+        "type_y":"theta",
+        "label_x":"Electron $\\theta$",
+        "label_y":"Photon2 $\\theta$",
+        "filename":"Electron_Theta_Photon2_Theta"       
+    }],
+
+    "EthetaGtheta": [{
+        "type":"2D",
+        "data_x":"Etheta",
+        "data_y":"Gtheta",
+        "type_x":"theta",
+        "type_y":"theta",
+        "label_x":"Electron $\\theta$",
+        "label_y":"Photon $\\theta$",
+        "filename":"Electron_Theta_Photon_Theta"       
+    }],
+
+    "EphiGphi2": [{
+        "type":"2D",
+        "data_x":"Ephi",
+        "data_y":"Gphi2",
+        "type_x":"phi",
+        "type_y":"phi",
+        "label_x":"Electron $\\phi$",
+        "label_y":"Photon2 $\\phi$",
+        "filename":"Electron_phi_Photon2_phi"       
+    }],
+
+    "EphiGphi": [{
+        "type":"2D",
+        "data_x":"Ephi",
+        "data_y":"Gphi",
+        "type_x":"phi",
+        "type_y":"phi",
+        "label_x":"Electron $\\phi$",
+        "label_y":"Photon $\\phi$",
+        "filename":"Electron_phi_Photon_phi"       
+    }],
+
     "PithetaPiphi": [{
         "type":"2D",
         "data_x":"Piphi",
