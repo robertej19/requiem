@@ -70,24 +70,25 @@ def img_from_pdf(img_dir):
     #for f in sort_list:
     #    print(f)
     #sys.exit()
-    left = 200
-    right = 200
-    bottom = 200
+    left = 450
+    right = 2680
+    bottom = 1515
     top = 200
     for img_file in sort_list:
         #print("On file " + img_file)
         image1 = Image.open(img_dir+img_file)
-        print(image1.size)
-        image1.crop((left, top, right, bottom))
-        image1.show()
-        sys.exit()
+        #print(image1.size)
+        image1 = image1.crop((left, top, right, bottom))
+        #print(image1.size)
+        #image1.show()
+        #sys.exit()
 
-        image_files.append(image2)
+        image_files.append(image1)
 
     return image_files
 
 def append_images(images, xb_counter, direction='horizontal', 
-                  bg_color=(255,255,255), aligment='center'):
+                  bg_color=(255,255,255), aligment='center',special_layer=False,labeling=[]):
     
     # Appends images in horizontal/vertical direction.
 
@@ -102,26 +103,58 @@ def append_images(images, xb_counter, direction='horizontal',
     #     Concatenated image as a new PIL image object.
     
     widths, heights = zip(*(i.size for i in images))
+
     scale_factor_w = 1
-    widths = (int(scale_factor_w*w) for w in widths)
-    heights = (int(1*h) for h in heights)
 
     if direction=='horizontal':
-        new_width = sum(widths)
+        new_width = sum(widths)+max(widths)*2
         new_height = max(heights)
+        offset_origin = max(widths)
     else:
         new_width = max(widths)
         new_height = sum(heights)
+        offset_origin = max(heights)
 
-    new_im = Image.new('RGB', (new_width, new_height), color=bg_color)
+    
+    if special_layer:
+        new_im = Image.new('RGB', (new_width, new_height), color=bg_color)
+
+        offset = offset_origin
+        for im_counter,im in enumerate(reversed(images)):
+                y = 0
+                if aligment == 'center':
+                    y = int((new_height - im.size[1])/2)
+                elif aligment == 'bottom':
+                    y = new_height - im.size[1]
+                fnt = ImageFont.truetype("Pillow/Tests/fonts/FreeMono.ttf", 400)
+                d = ImageDraw.Draw(new_im)
+                d.text((offset,y), str(labeling[im_counter]), font=fnt, fill=(0,0,0))
+                offset += int(im.size[0]*scale_factor_w)
+        
+
+        return new_im
+
+
 
     if direction=='vertical':
         new_im = Image.new('RGB', (int(new_width+0), int(new_height+images[0].size[1]/2)), color=bg_color)
 
+        #make row of labels for
+        #         fnt = ImageFont.truetype("Pillow/Tests/fonts/FreeMono.ttf", 400)
+        # d = ImageDraw.Draw(new_im)
+        # d.text((max(widths)/2,max(heights)/2), "1.0", font=fnt, fill=(18,128,1))
+        # print("appeneded text")
+    else:
+        new_im = Image.new('RGB', (new_width, new_height), color=bg_color)
+        fnt = ImageFont.truetype("Pillow/Tests/fonts/FreeMono.ttf", 400)
+        d = ImageDraw.Draw(new_im)
+        d.text((int(max(widths)/1.5),int(max(heights)/1.4)), str(labeling[0]), font=fnt, fill=(0,0,0))
+        print("appeneded text")
+    #add text
 
-    offset = 0
+
+    offset = offset_origin
     for im_counter,im in enumerate(reversed(images)):
-        ic(im_counter)
         if direction=='horizontal':
             y = 0
             if aligment == 'center':
@@ -154,8 +187,7 @@ fs = filestruct.fs()
 base_plot_dir = "Comparison_plots/"
 
 
-q2bins,xBbins, tbins, phibins = fs.q2bins[0:6], fs.xBbins[0:10], np.array(fs.tbins[0:9]), fs.phibins
-
+q2bins,xBbins, tbins, phibins = fs.q2bins[0:7], fs.xBbins[0:11], np.array(fs.tbins[0:9]), fs.phibins
 
 figures = os.listdir(base_plot_dir)
 #figures = figures[0:6]
@@ -167,8 +199,8 @@ figures = os.listdir(base_plot_dir)
 images = img_from_pdf(base_plot_dir)
 #images = images[0:6]
 
-num_ver_slices = len(q2bins)
-num_hori_slices = len(xBbins)
+num_ver_slices = len(q2bins)-1
+num_hori_slices = len(xBbins)-1
 #num_ver_slices = 2
 #num_hori_slices = 1
 
@@ -182,6 +214,13 @@ layers = layers[:,:-2] #Last two columns are empty
 
 
 horimg = []
+print(xBbins)
+#create special horizontal array with labels
+speciallayer = layers[0]
+imglay0 = append_images(speciallayer, -1, direction='horizontal',special_layer=True,labeling=xBbins)
+horimg.append(imglay0)
+
+
 
 for xb_counter,layer in enumerate(layers):
     layer = layer.tolist()
@@ -190,7 +229,9 @@ for xb_counter,layer in enumerate(layers):
     print("counter is {}".format(xb_counter))
     print("On vertical layer {}".format(xb_counter))
     #print(layer)
-    imglay = append_images(layer, -1, direction='horizontal')
+    print(q2bins)
+    print(xb_counter)
+    imglay = append_images(layer, -1, direction='horizontal',labeling=[q2bins[xb_counter]])
     #imglay.save("testing1.jpg")
     horimg.append(imglay)
 
