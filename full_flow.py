@@ -805,7 +805,7 @@ def run_analysis(mag_config,generator_type,unique_identifyer="",
                             q_mean_c12,x_mean_c12,t_mean_c12,                 
                             tel_c12,tt_c12,lt_c12,
                             mean_xsec_uncer_ratio_c12,
-                            qmin,xmin,qmax,xmax,
+                            qmin,xmin,tmin,qmax,xmax,tmax,
                             tel_c12_err,tt_c12_err,lt_c12_err,])
 
                         plt.rcParams["font.size"] = "20"
@@ -835,11 +835,11 @@ def run_analysis(mag_config,generator_type,unique_identifyer="",
                         plt.close()
 
         df_out = pd.DataFrame(sf_data_vals, columns = ['qC6','xC6','tC6','telC6','tel-statC6','tel-sysC6','ltC6','lt-statC6','lt-sysC6','ttC6','tt-statC6',
-                                        'tt-sysC6','qC12','xC12','tC12','tel_c12','tt_c12','lt_c12','mean_uncert_c12','qmin','xmin',
-                                        'qmax','xmax','tel_c12_err','tt_c12_err','lt_c12_err'])
+                                        'tt-sysC6','qC12','xC12','tC12','tel_c12','tt_c12','lt_c12','mean_uncert_c12','qmin','xmin','tmin',
+                                        'qmax','xmax','tmax','tel_c12_err','tt_c12_err','lt_c12_err'])
 
 
-        df_out.to_pickle(datafile_base_dir + final_xsec_dir+"struct_funcs.pkl")
+        df_out.to_pickle(datafile_base_dir + final_xsec_dir+"struct_funcs_"+run_identifiyer+".pkl")
 
 
 
@@ -871,7 +871,7 @@ for mc in mag_configs:
     for pl in proton_locs:
         for p1l in photon1_locs:
             for p2l in photon2_locs:
-                run_analysis(mc,generator_type,unique_identifyer="compare_c12_c6_bin_averages_simple_cuts",
+                run_analysis(mc,generator_type,unique_identifyer="for_t_q_deps",
                             det_proton_loc=pl,det_photon1_loc=p1l,det_photon2_loc=p2l,
                             convert_roots = 1,
                             make_exclusive_cuts = 1,

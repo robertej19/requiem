@@ -27,6 +27,15 @@ from utils import make_histos
 from utils import histo_plotting
 import matplotlib as mpl
 
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.optimize import curve_fit
+from scipy import stats
+import argparse
+import sys 
+import pandas as pd
+from matplotlib.patches import Rectangle
+
 from utils import filestruct
 
 pd.set_option('mode.chained_assignment', None)
@@ -54,13 +63,26 @@ E = 10.604
 cmap = plt.cm.jet  # define the colormap
 
 
-df = pd.read_pickle("interactive/dataArrays/full_xsection_outbending_rad_All_All_All_compare_c12_c6_bin_averages.pkl")
+def fit_function(x,A,B):
+    #A + B*np.cos(2*phi) +C*np.cos(phi)
+    #rads = phi*np.pi/180
+    #return (A * np.exp(-x/beta) + B * np.exp(-1.0 * (x - mu)**2 / (2 * sigma**2)))
+    #A = T+L, B=TT, C=LT
+    #A = black, B=blue, C=red
+    return A*np.exp(x*B)
 
-df.loc[:,"ratio"]= df['xsec_corr_red_nb']/df['dsdtdp']
+
+df = pd.read_pickle("interactive/dataArrays/full_xsection_outbending_rad_All_All_All_compare_c12_c6_bin_averages.pkl")
+#df = pd.read_pickle("/mnt/d/GLOBUS/CLAS12/APS2022/final_data_files/struct_funcsoutbending_rad_All_All_All_for_t_q_deps.pkl")
+
+for col in df.columns:
+    print(col)
+
+#df.loc[:,"ratio"]= df['xsec_corr_red_nb']/df['dsdtdp']
 df.replace([np.inf, -np.inf], np.nan, inplace=True)
 
-#q2bins,xBbins, tbins, phibins = fs.q2bins[0:8], fs.xBbins[0:12], np.array(fs.tbins[0:11]), fs.phibins
-q2bins,xBbins, tbins, phibins = np.array(fs.tbins[0:11]), fs.xBbins[0:12], fs.q2bins[0:8], fs.phibins
+q2bins,xBbins, tbins, phibins = fs.q2bins[0:8], fs.xBbins[0:12], np.array(fs.tbins[2:11]), fs.phibins
+#q2bins,xBbins, tbins, phibins = np.array(fs.tbins[0:11]), fs.xBbins[0:12], fs.q2bins[0:8], fs.phibins
 
 #q2bins,xBbins, tbins, phibins = np.array(fs.tbins[0:9]), np.array(fs.xBbins[0:12]) ,np.array(fs.q2bins[0:8]), fs.phibins
 
@@ -173,27 +195,119 @@ if int_across_phi:
     base_x_q = []
     base_x_q_6 = []
 
+    xb_dep = []
+    b_values_6 = []
+    b_values_12 = []
+    b_errs_6 = []
+    b_errs_12 = []
+
     for qmin,qmax in zip(q2bins[0:-1],q2bins[1:]):
-        print(" \n Q2 bin: {} to {}".format(qmin,qmax))
+        #print(" \n Q2 bin: {} to {}".format(qmin,qmax))
         base_x=[]
         base_x_6=[]
 
         for xmin,xmax in zip(xBbins[0:-1],xBbins[1:]):
             means_on_t_base = []
             means_on_t_base_6 = []
+            t_errs = []
+            t_errs_6 = []
 
             for tmin,tmax in zip(tbins[0:-1],tbins[1:]):
 
-                #query = "qmin == {} and xmin == {} and tmin == {}".format(qmin,xmin,tmin)
-                query = "qmin == {} and xmin == {} and tmin == {}".format(tmin,xmin,qmin)
+                query = "qmin == {} and xmin == {} and tmin == {}".format(qmin,xmin,tmin)
+                #query = "qmin == {} and xmin == {} and tmin == {}".format(tmin,xmin,qmin)
 
                 #print(query)
                 df_small = df.query(query)
                 #print(df_small['ratio'])
                 #print(df_small['ratio'].mean())
                 #means_on_t_base.append(df_small['ratio'].mean())
+
                 means_on_t_base.append(df_small['xsec_corr_red_nb'].mean())
                 means_on_t_base_6.append(df_small['dsdtdp'].mean())
+                t_errs.append(df_small['uncert_xsec_corr_red_nb'].mean())
+                t_errs_6.append(df_small['stat'].mean())
+                
+                # # # means_on_t_base.append(df_small['tel_c12'].mean())
+                # # # means_on_t_base_6.append(df_small['telC6'].mean())
+                # # # t_errs.append(df_small['mean_uncert_c12'].mean())
+                # # # t_errs_6.append(df_small['tel-statC6'].mean())
+
+
+            x = tbins[1:]#.tolist()
+            y = np.array(means_on_t_base)#.tolist()
+            y_6 = np.array(means_on_t_base_6)#.tolist()
+            y_err_6 = np.array(t_errs_6)#.tolist()
+            y_err = np.array(t_errs)#.tolist()
+
+
+
+            valid = ~(np.isnan(x) | np.isnan(means_on_t_base) | np.isnan(t_errs))
+            valid2 = ~(np.isnan(x) | np.isnan(y_6) | np.isnan(y_err_6))
+
+
+
+            #print(x[valid])
+            fit1, fit2 = False,False
+            try:
+                popt, pcov = curve_fit(fit_function, xdata=x[valid], ydata=y[valid],
+                    sigma=y_err[valid], absolute_sigma=True)
+                fit1 = True
+            except:
+                pass
+            
+            try:
+                popt2, pcov2 = curve_fit(fit_function, xdata=x[valid2], ydata=y_6[valid2],
+                    sigma=y_err_6[valid2], absolute_sigma=True)
+                fit2 = True
+            except:
+                pass
+            
+            if fit1 and fit2:
+                a,b = popt[0],popt[1]
+                print(b)
+                if b>-10:
+                    a2,b2 = popt2[0],popt2[1]
+
+                    a_err = np.sqrt(pcov[0][0])#*qmod
+                    b_err = np.sqrt(pcov[1][1])#*qmod
+                    a_err2 = np.sqrt(pcov2[0][0])#*qmod
+                    b_err2 = np.sqrt(pcov2[1][1])#*qmod
+
+                    #print(a/a2,b/b2)
+                    #print("\n Q2 bin: {} to {}".format(qmin,qmax))
+                    #print("xB bin: {} to {}".format(xmin,xmax))
+                    #print(b/b2,np.sqrt(b_err*b_err+b_err2*b_err2))
+                    #print(b,b_err)
+                    #print(b2,b_err2)
+                    xb_dep.append((xmin+xmax)/2)
+                    b_values_6.append(-1*b2)
+                    b_values_12.append(-1*b)
+                    b_errs_6.append(b_err2)
+                    b_errs_12.append(b_err)
+
+
+                    xspace = np.linspace(0, 2, 1000)
+
+                    fit_y_data_weighted_12 = fit_function(xspace,a,b)
+                    fit_y_data_weighted_6 = fit_function(xspace,a2,b2)
+
+
+
+                    fig, ax = plt.subplots(figsize =(36, 17)) 
+                    plt.errorbar(x,means_on_t_base,yerr=t_errs,linestyle="None",marker="x",ms=12,color="red",label="CLAS12")
+                    plt.errorbar(x,means_on_t_base_6,yerr=t_errs_6,linestyle="None",marker="x",ms=12,color="blue",label="CLAS6")  
+                    fit2, = ax.plot(xspace, fit_y_data_weighted_6, color='blue', linewidth=2.5, label='CLAS6 Fit:')
+                    #fit3, = ax.plot(xspace, fit_y_data_weighted_new, color='black', linewidth=2.5, label='New CLAS6 Fit: t+l:{:.0f} tt:{:.0f} lt:{:.0f}'.format(tel,tt,lt))
+                    fit4, = ax.plot(xspace, fit_y_data_weighted_12, color='red', linewidth=2.5, label='CLAS12 Fit: ')
+                    plt.legend()
+                    #plt.plot(tbins[1:],means_on_t_base,marker="+",ms=20)
+                    #plt.plot(tbins[1:],means_on_t_base_6,marker="+",ms=20)
+                    plt.title("t Dep of xsection, Q2 = {}, xB = {}".format(qmin,xmin))
+                    ax.set_yscale("log")
+                    plt.show()
+
+            
 
             base_x.append(means_on_t_base)
             base_x_6.append(means_on_t_base_6)
@@ -201,47 +315,61 @@ if int_across_phi:
         base_x_q_6.append(base_x_6)
 
 
+    fig, ax = plt.subplots(figsize =(36, 17)) 
+    plt.errorbar(xb_dep,b_values_6,yerr=b_errs_6,linestyle="None",marker="x",ms=12,color="blue",label="CLAS6")
+    plt.errorbar(xb_dep,b_values_12,yerr=b_errs_12,linestyle="None",marker="x",ms=12,color="red",label="CLAS12")    
+    #plt.plot(tbins[1:],means_on_t_base,marker="+",ms=20)
+    #plt.plot(tbins[1:],means_on_t_base_6,marker="+",ms=20)
+    plt.title("t Dep of xsection, Q2 = {}, xB = {}".format(qmin,xmin))
+    #ax.set_yscale("log")
+    plt.legend()
+    plt.show()
+
+
+    sys.exit()
+
     q_colors = ['red','orange','yellow','green','blue','purple','black','cyan','magenta','brown','pink','gray','olive','salmon','gold','teal','navy','indigo','maroon','lime','tan','aqua','darkgreen','darkblue','darkcyan','darkmagenta','darkred','darkorange','darkyellow','darkgreen','darkblue','darkpurple','darkcyan','darkmagenta','darkbrown','darkpink','darkgray','darkolive','darksalmon','darkgold','darkteal','darknavy','darkindigo','darkmaroon','darklime','darktan','darkaqua']
     #q_colors = ['black','purple','blue','green','yellow','orange','red']
 
-    # # q_labels = q2bins[0:-1]
-    # # for q_count, bigarr in enumerate(base_x_q):
-    # #     color = q_colors[q_count]
-    # #     label = q_labels[q_count]
-    # #     legend_counter = 0
-    # #     for arr in bigarr:
-    # #         print("here")
-    # #         print(arr)
-    # #         if legend_counter == 0:
-    # #             plt.plot(tbins[0:-1],arr,color=color,label="-t: {}".format(label))
-    # #             legend_counter += 1
-    # #         else:
-    # #             plt.plot(tbins[0:-1],arr,color=color)
-
-    #FOR integraton over xB
-    q_labels = q2bins[0:-1]
-
     fig, ax = plt.subplots(figsize =(36, 17)) 
 
+    q_labels = q2bins[0:-1]
     for q_count, bigarr in enumerate(base_x_q):
-        bigarr_6 = base_x_q_6[q_count]
         color = q_colors[q_count]
         label = q_labels[q_count]
         legend_counter = 0
-        print('HEREE')
-        print(bigarr)
-        arr = np.nanmean(bigarr,axis=0)
-        arr_6 = np.nanmean(bigarr_6,axis=0)
+        for arr in bigarr:
+            print("here")
+            print(arr)
+            if legend_counter == 0:
+                plt.plot(tbins[0:-1],arr,color=color,label="-t: {}".format(label))
+                legend_counter += 1
+            else:
+                plt.plot(tbins[0:-1],arr,color=color)
 
-        print(arr)
-        if legend_counter == 0:
-            plt.plot(tbins[0:-1],arr,color=color,label="Q$^2$: {}".format(label))
-            plt.plot(tbins[0:-1],arr_6,color=color,linestyle='--',)#,label="Q$^2_6$: {}".format(label))
+    # #FOR integraton over xB
+    # q_labels = q2bins[0:-1]
 
-            legend_counter += 1
-        else:
-            plt.plot(tbins[0:-1],arr,color=color)
-            plt.plot(tbins[0:-1],arr_6,color=color,linestyle='--',)
+
+    # for q_count, bigarr in enumerate(base_x_q):
+    #     bigarr_6 = base_x_q_6[q_count]
+    #     color = q_colors[q_count]
+    #     label = q_labels[q_count]
+    #     legend_counter = 0
+    #     print('HEREE')
+    #     print(bigarr)
+    #     arr = np.nanmean(bigarr,axis=0)
+    #     arr_6 = np.nanmean(bigarr_6,axis=0)
+
+    #     print(arr)
+    #     if legend_counter == 0:
+    #         plt.plot(tbins[0:-1],arr,color=color,label="Q$^2$: {}".format(label))
+    #         plt.plot(tbins[0:-1],arr_6,color=color,linestyle='--',)#,label="Q$^2_6$: {}".format(label))
+
+    #         legend_counter += 1
+    #     else:
+    #         plt.plot(tbins[0:-1],arr,color=color)
+    #         plt.plot(tbins[0:-1],arr_6,color=color,linestyle='--',)
 
 
     #FOR integraton over everything but 1
