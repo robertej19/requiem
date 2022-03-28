@@ -26,22 +26,34 @@ def makeDVpi0P(df_epgg, pol = "inbending",proton_loc="All",photon1_loc="All",pho
         cut_Ptheta_low_mid_hi = (cut_Ptheta_low & cut_Ptheta_mid)|(cut_Ptheta_mid2 & cut_Ptheta_hi)
 
 
-        cut_Gpz2_low = df_epgg.loc[:, "Gpz2"] > 0#0.4  # Gpz2
+        cut_Gpz2_low = df_epgg.loc[:, "Gpz2"] > 0.4#0.4  # Gpz2
         cut_Gpz_hi = df_epgg.loc[:, "Gpz"] < 6000  # Gpz2
 
-        cut_pi0upper = df_epgg.loc[:, "Mpi0"] < 0.2
-        cut_pi0lower = df_epgg.loc[:, "Mpi0"] > 0.07
+
+
+
+        #Collaboration approved
+        cut_pi0upper = df_epgg.loc[:, "Mpi0"] < 0.168
+        cut_pi0lower = df_epgg.loc[:, "Mpi0"] > 0.096
+        cut_recon = df_epgg.loc[:, "reconPi"] < 2  # recon gam angle
+        cut_mpt_hi = df_epgg.loc[:, "MPt"] < 0.2  # mpt
+        cut_mpt_low = df_epgg.loc[:, "MPt"] > -0.2  # mpt
+        cut_mmepgg_hi = np.abs(df_epgg["MM2_epgg"]) < 0.05#0.0440  # mmepgg
+        cut_mmepgg_low = np.abs(df_epgg["MM2_epgg"]) > -0.05#-0.0478  # mmepgg
+
+        #Extra
+
         cut_mmep_hi = df_epgg.loc[:, "MM2_ep"] < 0.2#0.7  # mmep
         cut_mmep_low = df_epgg.loc[:, "MM2_ep"] > -0.196#-0.66  # mmep
         cut_mmegg_hi = df_epgg.loc[:, "MM2_egg"] < 1.6 #0.95  # mm_egg
         cut_mmegg_low = df_epgg.loc[:, "MM2_egg"] > 0.16 # 0.8  # mm_egg
-        cut_meepgg_hi = df_epgg.loc[:, "ME_epgg"] < 0.7  # meepgg
-        cut_meepgg_low = df_epgg.loc[:, "ME_epgg"] > -0.7  # meepgg
-        cut_mpt_hi = df_epgg.loc[:, "MPt"] < 0.2  # mpt
-        cut_mpt_low = df_epgg.loc[:, "MPt"] > -0.2  # mpt
-        cut_recon = df_epgg.loc[:, "reconPi"] < 2  # recon gam angle
-        cut_mmepgg_hi = np.abs(df_epgg["MM2_epgg"]) < 0.05#0.0440  # mmepgg
-        cut_mmepgg_low = np.abs(df_epgg["MM2_epgg"]) > -0.05#-0.0478  # mmepgg
+        cut_meepgg_hi = df_epgg.loc[:, "ME_epgg"] < 0.5  # meepgg
+        cut_meepgg_low = df_epgg.loc[:, "ME_epgg"] > -0.5  # meepgg
+
+
+
+
+
 
         #Optional cuts
         cut_FD_proton = (df_epgg.loc[:, "Psector"]<7)# & (df_epgg.loc[:, "Ptheta"]<35)

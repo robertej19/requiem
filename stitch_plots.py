@@ -71,8 +71,8 @@ def img_from_pdf(img_dir):
     #    print(f)
     #sys.exit()
     left = 450
-    right = 2680
-    bottom = 1515
+    right = 3300#2680
+    bottom = 1700#1515
     top = 200
     for img_file in sort_list:
         #print("On file " + img_file)
@@ -184,7 +184,8 @@ def chunks(l, n):
 
 fs = filestruct.fs()
 
-base_plot_dir = "Comparison_plots/"
+#base_plot_dir = "Comparison_plots/"
+base_plot_dir = "tdepfigs/"
 
 
 q2bins,xBbins, tbins, phibins = fs.q2bins[0:7], fs.xBbins[0:11], np.array(fs.tbins[0:9]), fs.phibins

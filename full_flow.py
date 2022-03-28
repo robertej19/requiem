@@ -288,7 +288,7 @@ def run_analysis(mag_config,generator_type,unique_identifyer="",
     else:
         convert_root_exp = True
         convert_root_rec = True
-        convert_root_gen = False
+        convert_root_gen = True
         calc_lumi = False
 
     if not plot_initial_distros:
@@ -308,7 +308,7 @@ def run_analysis(mag_config,generator_type,unique_identifyer="",
         make_ex_cut_rec = False
     else:
         make_ex_cut_exp = True
-        make_ex_cut_gen = 0
+        make_ex_cut_gen = True
         make_ex_cut_rec = True
 
 
@@ -379,9 +379,11 @@ def run_analysis(mag_config,generator_type,unique_identifyer="",
             df_rec.to_pickle(datafile_base_dir+raw_data_dir+rec_file_base+".pkl")
 
         if convert_root_gen:
+            print("CONVERING ROOT GEN")
             df_gen = gen_converter.readEPGG(
                 datafile_base_dir+roots_dir+path_to_gen_root+gen_file_base+".root")
-
+            print("SAVING GEN ROOT FILE TO {}".format(datafile_base_dir+raw_data_dir+gen_file_base+".pkl"))
+            
             df_gen.to_pickle(datafile_base_dir+raw_data_dir+gen_file_base+".pkl")
 
         if calc_lumi:
@@ -470,9 +472,10 @@ def run_analysis(mag_config,generator_type,unique_identifyer="",
                                             df_2=df_rec_epgg,first_label=exp_common_name,second_label=rec_common_name)
         if plot_final_rec_exp_distros:
             title_dir = datafile_base_dir+final_distros_dir+final_rec_exp_plots_dir
+            # histo_plotting.make_all_histos(df_dvpip_exp,datatype="rec",hists_2d=False,hists_1d=False,hists_overlap=True,saveplots=True,output_dir = title_dir,
+            #                                 df_2=df_dvpip_rec,first_label=exp_common_name,second_label=rec_common_name,plot_title_identifiyer=run_identifiyer)
             histo_plotting.make_all_histos(df_dvpip_exp,datatype="rec",hists_2d=False,hists_1d=False,hists_overlap=True,saveplots=True,output_dir = title_dir,
-                                            df_2=df_dvpip_rec,first_label=exp_common_name,second_label=rec_common_name,plot_title_identifiyer=run_identifiyer)
-
+                                            df_2=df_dvpip_rec,first_label="exp",second_label="sim",plot_title_identifiyer=run_identifiyer)
 
         ########################################
         if make_ex_cut_gen:
@@ -812,17 +815,17 @@ def run_analysis(mag_config,generator_type,unique_identifyer="",
 
                         fig, ax = plt.subplots(figsize =(14, 10)) 
 
-                        plt.errorbar(binscenters, data_entries, yerr=sigma, color="red",fmt="o",label="CLAS6 Data")
+                        plt.errorbar(binscenters, data_entries, yerr=sigma, color="red",fmt="o",label='CLAS6 Data')#. Bin Averages: Q2: {:.2f} xB: {:.2f} t: {:.2f}'.format(df_sf_binned_small['q'].values[0],df_sf_binned_small['x'].values[0],df_sf_binned_small['t'].values[0]))
 
-                        plt.errorbar(binscenters_c12, data_entries_c12, yerr=sigma_c12, color="blue",fmt="x",label="CLAS12 Data")
+                        plt.errorbar(binscenters_c12, data_entries_c12, yerr=sigma_c12, color="blue",fmt="x",label='CLAS12 Data')#. Bin Averages: Q2: {:.2f} xB: {:.2f} t: {:.2f}'.format(df_small["qave_exp"].mean(),df_small["xave_exp"].mean(),df_small["tave_exp"].mean()))
 
                         plt.rcParams["font.size"] = "20"
 
                         #fit2, = ax.plot(xspace, fit_y_data_weighted, color='red', linewidth=2.5, label='CLAS6 Fit:         t+l:{:.0f} tt:{:.0f} lt:{:.0f}'.format(pub_tel,pub_tt,pub_lt))
-                        fit2, = ax.plot(xspace, fit_y_data_weighted, color='red', linewidth=2.5, label='CLAS6 Bin:         Q2: {:.2f} xB: {:.2f} t: {:.2f}'.format(df_sf_binned_small['q'].values[0],df_sf_binned_small['x'].values[0],df_sf_binned_small['t'].values[0]))
+                        fit2, = ax.plot(xspace, fit_y_data_weighted, color='red', linewidth=2.5)#, label='CLAS6 Fit')        
                         
                         #fit4, = ax.plot(xspace, fit_y_data_weighted_new_c12, color='blue', linewidth=2.5, label='CLAS12 Fit: t+l:{:.0f} tt:{:.0f} lt:{:.0f}'.format(tel_c12,tt_c12,lt_c12))
-                        fit4, = ax.plot(xspace, fit_y_data_weighted_new_c12, color='blue', linewidth=2.5, label='CLAS12 Bin:      Q2: {:.2f} xB: {:.2f} t: {:.2f}'.format(df_small["qave_exp"].mean(),df_small["xave_exp"].mean(),df_small["tave_exp"].mean()))
+                        fit4, = ax.plot(xspace, fit_y_data_weighted_new_c12, color='blue', linewidth=2.5)#, label='CLAS12 Fit')     
                         
                         ax.legend(loc="best")
                         ax.set_xlabel("Phi")  
@@ -861,6 +864,7 @@ def run_analysis(mag_config,generator_type,unique_identifyer="",
 # # # photon2_locs = ["FD","FT","All"]
 
 #mag_configs = ["inbending","outbending"]
+#mag_configs = ["outbending",]#"outbending"]
 mag_configs = ["outbending",]#"outbending"]
 generator_type = "rad"
 proton_locs = ["All",]
@@ -871,18 +875,19 @@ for mc in mag_configs:
     for pl in proton_locs:
         for p1l in photon1_locs:
             for p2l in photon2_locs:
-                run_analysis(mc,generator_type,unique_identifyer="for_t_q_deps",
+                run_analysis(mc,generator_type,unique_identifyer="no_smearing",
                             det_proton_loc=pl,det_photon1_loc=p1l,det_photon2_loc=p2l,
                             convert_roots = 1,
                             make_exclusive_cuts = 1,
                             plot_initial_distros = 0,
                             plot_final_distros = 1,
                             bin_all_events = 1,
-                            bin_gen = 1,
+                            bin_gen = 0,
                             calc_xsection = 1,
                             plot_reduced_xsec_and_fit = 1,
                             plot_1_D_hists = 1,
-                            simple_exclusivity_cuts=False)
+                            simple_exclusivity_cuts=False,
+                            emergency_stop = 1)
 
 
 sys.exit()
@@ -902,7 +907,7 @@ for q,x,t in zip(q2_ranges,xB_ranges,t_ranges):
 
     #mag_configs = ["inbending","outbending"]
     mag_configs = ["outbending"]
-    generator_type = "rad"
+    generator_type = "norad"
     pl = "All"
     p1l = "All"
     p2l = "All"

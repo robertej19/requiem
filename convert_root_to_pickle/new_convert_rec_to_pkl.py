@@ -483,6 +483,7 @@ class root2pickle():
 
             #smearing proton after the energy loss correction
             print("smearing factor {} from nominal".format(smearing))
+            smearing=0
             #CD proton
             def cubic(args, x): #equivalent to poly1d
                 a, b, c, d = args

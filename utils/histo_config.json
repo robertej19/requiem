@@ -7,8 +7,8 @@
         "t":[[0,7,120],"-$GeV^2$"],
         "pmom":[[0,2,120],"$GeV$"],
         "gmom":[[0,4,120],"$GeV$"],
-        "xB":[[0,1,120],"None"],
-        "Q2":[[0,12,120],"$GeV^2$"],
+        "xB":[[0.05,0.8,120],"None"],
+        "Q2":[[0.5,11,120],"$GeV^2$"],
         "W":[[1,4.5,120],"$GeV$"]
     }],
 
@@ -165,7 +165,7 @@
         "data_y":"Ptheta",
         "type_x":"Q2",
         "type_y":"theta",
-        "label_x":"$Q^2$",
+        "label_x":"Q$^2$",
         "label_y":"Proton $\\theta$",
         "filename":"Q2PTheta"       
     }],
@@ -176,7 +176,7 @@
         "data_y":"Pphi",
         "type_x":"Q2",
         "type_y":"phi",
-        "label_x":"$Q^2$",
+        "label_x":"Q$^2$",
         "label_y":"Proton $\\phi$",
         "filename":"Q2Pphi"       
     }],
@@ -187,7 +187,7 @@
         "data_y":"Etheta",
         "type_x":"Q2",
         "type_y":"theta",
-        "label_x":"$Q^2$",
+        "label_x":"Q$^2$",
         "label_y":"Electron $\\theta$",
         "filename":"Q2Etheta"       
     }],
@@ -198,7 +198,7 @@
         "data_y":"Ephi",
         "type_x":"Q2",
         "type_y":"phi",
-        "label_x":"$Q^2$",
+        "label_x":"Q$^2$",
         "label_y":"Electron $\\phi$",
         "filename":"Q2Ephi"       
     }],
@@ -209,7 +209,7 @@
         "data_y":"Gtheta",
         "type_x":"Q2",
         "type_y":"theta",
-        "label_x":"$Q^2$",
+        "label_x":"Q$^2$",
         "label_y":"Photon $\\theta$",
         "filename":"Q2GTheta"       
     }],
@@ -220,7 +220,7 @@
         "data_y":"Gphi",
         "type_x":"Q2",
         "type_y":"phi",
-        "label_x":"$Q^2$",
+        "label_x":"Q$^2$",
         "label_y":"Photon $\\phi$",
         "filename":"Q2Gphi"       
     }],
@@ -231,7 +231,7 @@
         "data_y":"Gtheta2",
         "type_x":"Q2",
         "type_y":"theta",
-        "label_x":"$Q^2$",
+        "label_x":"Q$^2$",
         "label_y":"Photon2 $\\theta$",
         "filename":"Q2GTheta2"       
     }],
@@ -242,7 +242,7 @@
         "data_y":"Gphi2",
         "type_x":"Q2",
         "type_y":"phi",
-        "label_x":"$Q^2$",
+        "label_x":"Q$^2$",
         "label_y":"Photon2 $\\phi$",
         "filename":"Q2Gphi2"       
     }],
@@ -309,7 +309,7 @@
         "type_x":"phitrento",
         "type_y":"Q2",
         "label_x":"Lepton-Hadron Angle $\\phi$",
-        "label_y":"$Q^2$",
+        "label_y":"Q$^2$",
         "filename":"PhiTrento_Q2"       
     }],
 
@@ -343,7 +343,7 @@
         "type_x":"W",
         "type_y":"Q2",
         "label_x":"$W$",
-        "label_y":"$Q^2$",
+        "label_y":"Q$^2$",
         "filename":"W_Q2"       
     }],
 
@@ -357,7 +357,7 @@
         "type_x":"xB",
         "type_y":"Q2",
         "label_x":"$x_B$",
-        "label_y":"$Q^2$",
+        "label_y":"Q$^2$",
         "filename":"BjorkenX_Q2"       
     }],
 
