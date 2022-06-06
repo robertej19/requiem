@@ -14,10 +14,14 @@ def makeDVpi0P(df_epgg, pol = "inbending",proton_loc="All",photon1_loc="All",pho
         cut_Q2 = (df_epgg.loc[:, "Q2"] > 1)# & (df_epgg.loc[:, "Q2"] <1.5)  # Q2
         cut_W = df_epgg.loc[:, "W"] > 2  # W
 
+        cut_etheta_discrep = df_epgg.loc[:, "Etheta"] > 9 # W
+
+
         cut_Ptheta_low = df_epgg.loc[:, "Ptheta"] > 5  # W
         cut_Ptheta_hi = df_epgg.loc[:, "Ptheta"] < 65  # W
-        cut_Ptheta_mid = df_epgg.loc[:, "Ptheta"] < 35  # W
+        cut_Ptheta_mid = df_epgg.loc[:, "Ptheta"] < 42#35  # W
         cut_Ptheta_mid2 = df_epgg.loc[:, "Ptheta"] >42  # W
+
 
         cut_Pphi_low = df_epgg.loc[:, "Pphi"] > -360  # W
         cut_Pphi_hi = df_epgg.loc[:, "Pphi"] < 360  # W
@@ -106,6 +110,7 @@ def makeDVpi0P(df_epgg, pol = "inbending",proton_loc="All",photon1_loc="All",pho
                                 cut_photon1 &
                                 cut_Gpz2_low &
                                 cut_Gpz_hi &
+                                cut_etheta_discrep &
                                 cut_photon2, :]
 
         df_dvpi0 = df_dvpi0.sort_values(by=['closeness', 'Psector', 'Gsector'], ascending = [True, True, True])
@@ -137,7 +142,10 @@ def makeDVpi0P(df_epgg, pol = "inbending",proton_loc="All",photon1_loc="All",pho
         cut_Ppmax = df_dvpi0p.Pp < 1.6  # Pp
         cut_Pthetamin = df_dvpi0p.Ptheta > 0  # Ptheta
         # cut_Vz = np.abs(df_dvcs["Evz"] - df_dvcs["Pvz"]) < 2.5 + 2.5 / mag([df_dvcs["Ppx"], df_dvcs["Ppy"], df_dvcs["Ppz"]])
-        cut_common = cut_xBupper & cut_xBlower & cut_Q2 & cut_W & cut_Ee & cut_Ge2 & cut_Esector & cut_Psector & cut_Ppmax & cut_Pthetamin
+
+        cut_etheta_discrep = df_dvpi0p.loc[:, "Etheta"] > 0.0009 # W
+
+        cut_common = cut_xBupper & cut_xBlower & cut_Q2 & cut_W & cut_Ee & cut_Ge2 & cut_Esector & cut_Psector & cut_Ppmax & cut_Pthetamin & cut_etheta_discrep
 
         df_dvpi0p = df_dvpi0p[cut_common]
 

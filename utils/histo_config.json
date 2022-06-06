@@ -3,6 +3,7 @@
         "type":"config",
         "phi":[[-180,180,120],"Deg."],
         "theta":[[0,70,100],"Deg."],
+        "nothadron_theta":[[0,30,100],"Deg."],
         "phitrento":[[0,360,120],"Deg."],
         "t":[[0,7,120],"-$GeV^2$"],
         "pmom":[[0,2,120],"$GeV$"],
@@ -43,7 +44,7 @@
         "data_x":"Gphi",
         "data_y":"Gtheta",
         "type_x":"phi",
-        "type_y":"theta",
+        "type_y":"nothadron_theta",
         "label_x":"Photon $\\phi$",
         "label_y":"Photon $\\theta$",
         "filename":"Photon_Theta_Photon_Phi"       
@@ -54,7 +55,7 @@
         "data_x":"Gphi2",
         "data_y":"Gtheta2",
         "type_x":"phi",
-        "type_y":"theta",
+        "type_y":"nothadron_theta",
         "label_x":"Photon 2 $\\phi$",
         "label_y":"Photon 2 $\\theta$",
         "filename":"Photon_Theta_Photon_Phi"       
@@ -65,7 +66,7 @@
         "data_x":"Ptheta",
         "data_y":"Gtheta",
         "type_x":"theta",
-        "type_y":"theta",
+        "type_y":"nothadron_theta",
         "label_x":"Proton $\\theta$",
         "label_y":"Photon1 $\\theta$",
         "filename":"Proton_Theta_Photon1_Theta"       
@@ -75,8 +76,8 @@
         "type":"2D",
         "data_x":"Gtheta",
         "data_y":"Gtheta2",
-        "type_x":"theta",
-        "type_y":"theta",
+        "type_x":"nothadron_theta",
+        "type_y":"nothadron_theta",
         "label_x":"Photon1 $\\theta$",
         "label_y":"Photon2 $\\theta$",
         "filename":"Photon1_Theta_Photon2s_Theta"       
@@ -87,7 +88,7 @@
         "data_x":"Ptheta",
         "data_y":"Gtheta2",
         "type_x":"theta",
-        "type_y":"theta",
+        "type_y":"nothadron_theta",
         "label_x":"Proton $\\theta$",
         "label_y":"Photon2 $\\theta$",
         "filename":"Proton_Theta_Photon2_Theta"       
@@ -97,8 +98,8 @@
         "type":"2D",
         "data_x":"Etheta",
         "data_y":"Gtheta2",
-        "type_x":"theta",
-        "type_y":"theta",
+        "type_x":"nothadron_theta",
+        "type_y":"nothadron_theta",
         "label_x":"Electron $\\theta$",
         "label_y":"Photon2 $\\theta$",
         "filename":"Electron_Theta_Photon2_Theta"       
@@ -108,8 +109,8 @@
         "type":"2D",
         "data_x":"Etheta",
         "data_y":"Gtheta",
-        "type_x":"theta",
-        "type_y":"theta",
+        "type_x":"nothadron_theta",
+        "type_y":"nothadron_theta",
         "label_x":"Electron $\\theta$",
         "label_y":"Photon $\\theta$",
         "filename":"Electron_Theta_Photon_Theta"       
@@ -186,7 +187,7 @@
         "data_x":"Q2",
         "data_y":"Etheta",
         "type_x":"Q2",
-        "type_y":"theta",
+        "type_y":"nothadron_theta",
         "label_x":"Q$^2$",
         "label_y":"Electron $\\theta$",
         "filename":"Q2Etheta"       
@@ -208,7 +209,7 @@
         "data_x":"Q2",
         "data_y":"Gtheta",
         "type_x":"Q2",
-        "type_y":"theta",
+        "type_y":"nothadron_theta",
         "label_x":"Q$^2$",
         "label_y":"Photon $\\theta$",
         "filename":"Q2GTheta"       
@@ -230,7 +231,7 @@
         "data_x":"Q2",
         "data_y":"Gtheta2",
         "type_x":"Q2",
-        "type_y":"theta",
+        "type_y":"nothadron_theta",
         "label_x":"Q$^2$",
         "label_y":"Photon2 $\\theta$",
         "filename":"Q2GTheta2"       
@@ -379,7 +380,7 @@
         "data_x":"Ephi",
         "data_y":"Etheta",
         "type_x":"phi",
-        "type_y":"theta",
+        "type_y":"nothadron_theta",
         "label_x":"Electron $\\phi$",
         "label_y":"Electron $\\theta$",
         "filename":"Electron_Theta_Electron_Phi"       

@@ -27,7 +27,7 @@ def plot_2dhist(x_data,y_data,var_names,ranges,colorbar=True,
     y_bins = np.linspace(ymin, ymax, num_ybins) 
 
     # Creating plot
-    fig, ax = plt.subplots(figsize =(14, 10)) 
+    fig, ax = plt.subplots(figsize =(18, 10)) 
     if units[0] == "None":
         ax.set_xlabel("{}".format(x_name))
     else:
@@ -103,7 +103,7 @@ def plot_1dhist(x_data,vars,ranges="none",second_x=False,second_x_data=[],logger
         x_bins = np.linspace(xmin, xmax, num_xbins) 
 
         # Creating plot
-        fig, ax = plt.subplots(figsize =(14, 10)) 
+        fig, ax = plt.subplots(figsize =(18, 10)) 
             
         ax.set_xlabel(x_name)  
         ax.set_ylabel('counts')  

@@ -62,6 +62,7 @@ def bin_df(df_in,df_type="real"):
         query = "{}Q2 > {} and {}Q2 < {}".format(prefix,qmin,prefix,qmax)
         df_q = df.query(query)
 
+        print(df_q)
         for xmin,xmax in zip(xBbins[0:-1],xBbins[1:]):
             #print("        xB bin: {} to {}".format(xmin,xmax))
             query = "{}xB > {} and {}xB < {}".format(prefix,xmin,prefix,xmax)
@@ -74,6 +75,7 @@ def bin_df(df_in,df_type="real"):
                 for pmin,pmax in zip(phibins[0:-1],phibins[1:]):
                     query = "{}phi1 > {} and {}phi1 < {}".format(prefix,pmin,prefix,pmax)
                     df_qxtp =  df_qxt.query(query)
+                    
 
                     mean_q2 =    df_qxtp["{}Q2".format(prefix)].mean(axis=0)
                     mean_xb =    df_qxtp["{}xB".format(prefix)].mean(axis=0)
@@ -82,11 +84,11 @@ def bin_df(df_in,df_type="real"):
                     mean_y =  df_qxtp["{}y".format(prefix)].mean(axis=0)
 
 
-                    num_counts.append([qmin,xmin,tmin,pmin,mean_q2,mean_y,mean_xb,mean_t1,mean_phi,len(df_qxtp.index)])
+                    num_counts.append([qmin,xmin,tmin,pmin,qmax,xmax,tmax,pmax,mean_q2,mean_y,mean_xb,mean_t1,mean_phi,len(df_qxtp.index)])
 
 
 
-    df_minibin = pd.DataFrame(num_counts, columns = ['qmin','xmin','tmin','pmin','qave','yave','xave','tave','pave',prefix+'counts'])
+    df_minibin = pd.DataFrame(num_counts, columns = ['qmin','xmin','tmin','pmin','qmax','xmax','tmax','pmax','qave','yave','xave','tave','pave',prefix+'counts'])
     print("Total number of binned events: {}".format(df_minibin[prefix+'counts'].sum()))
     print("Total number of original events: {}".format(total_num))
     return df_minibin
